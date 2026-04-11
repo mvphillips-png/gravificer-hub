@@ -423,6 +423,68 @@
     line-height: 1.75;
   }
 
+  .mat-examples {
+    padding: 0 18px 14px;
+    border-top: 1px solid var(--border);
+    margin-top: 0;
+  }
+
+  .mat-examples-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--faint);
+    text-transform: uppercase;
+    padding-top: 14px;
+    margin-bottom: 10px;
+  }
+
+  .mat-example-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+    align-items: flex-start;
+  }
+
+  .mat-example-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 7px;
+  }
+
+  .mat-example-text {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .mat-rewrite {
+    margin: 0 18px 18px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+  }
+
+  .mat-rewrite-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--faint);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .mat-rewrite-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.7;
+    font-style: italic;
+  }
+
   /* Architect's note */
   .architect-note {
     background: var(--card);
@@ -606,15 +668,15 @@ Analyze the input across all four materials. Return ONLY a valid JSON object —
 
 {
   "materials": {
-    "art":       { "status": "<Strong|Balanced|Weak|Missing|Overloaded>", "score": <0-100>, "read": "<2-3 sentences>" },
-    "energy":    { "status": "<Strong|Balanced|Weak|Missing|Overloaded>", "score": <0-100>, "read": "<2-3 sentences>" },
-    "knowledge": { "status": "<Strong|Balanced|Weak|Missing|Overloaded>", "score": <0-100>, "read": "<2-3 sentences>" },
-    "patterns":  { "status": "<Strong|Balanced|Weak|Missing|Overloaded>", "score": <0-100>, "read": "<2-3 sentences>" }
+    "art":       { "status": "<Strong|Balanced|Weak|Missing|Overloaded>", "score": <0-100>, "read": "<2-3 sentences>", "examples": ["<specific example of what stronger Art looks like for this input>", "<second example>", "<third example>"], "rewrite": "<A rewritten version of the input that strengthens the Art material specifically>" },
+    "energy":    { "status": "<Strong|Balanced|Weak|Missing|Overloaded>", "score": <0-100>, "read": "<2-3 sentences>", "examples": ["<specific example>", "<second example>", "<third example>"], "rewrite": "<A rewritten version that strengthens the Energy material specifically>" },
+    "knowledge": { "status": "<Strong|Balanced|Weak|Missing|Overloaded>", "score": <0-100>, "read": "<2-3 sentences>", "examples": ["<specific example>", "<second example>", "<third example>"], "rewrite": "<A rewritten version that strengthens the Knowledge material specifically>" },
+    "patterns":  { "status": "<Strong|Balanced|Weak|Missing|Overloaded>", "score": <0-100>, "read": "<2-3 sentences>", "examples": ["<specific example>", "<second example>", "<third example>"], "rewrite": "<A rewritten version that strengthens the Patterns material specifically>" }
   },
   "directive": "<One precise, actionable sentence — the single most important adjustment to make to strengthen this signal>"
 }
 
-Score 0-100 represents how present and effective that material is. Be specific and surgical in every read. The directive must be concrete — not generic advice.`;
+Examples must be specific to the input — not generic. Each rewrite should improve only that one material while keeping the core idea intact. Score 0-100 represents how present and effective that material is. Be surgical in every read.`;
 
 async function runAudit() {
   hideErr();
@@ -637,7 +699,7 @@ async function runAudit() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
+        max_tokens: 2000,
         system: SYS,
         messages: [{ role: 'user', content: 'Audit this signal:\n\n' + text }]
       })
@@ -701,6 +763,13 @@ function render(d) {
     const panel = document.createElement('div');
     panel.className = 'mat-panel';
     panel.style.borderTop = `3px solid ${m.color}`;
+
+    const examples = (mat.examples || []).map(ex => `
+      <div class="mat-example-item">
+        <div class="mat-example-dot" style="background:${m.color};"></div>
+        <div class="mat-example-text">${ex}</div>
+      </div>`).join('');
+
     panel.innerHTML = `
       <div class="mat-header">
         <div class="mat-title">
@@ -709,7 +778,17 @@ function render(d) {
         </div>
         <div class="bal-status ${statusClass}">${status}</div>
       </div>
-      <div class="mat-body">${mat.read || ''}</div>`;
+      <div class="mat-body">${mat.read || ''}</div>
+      ${examples ? `
+      <div class="mat-examples">
+        <div class="mat-examples-label">What stronger ${m.label} looks like</div>
+        ${examples}
+      </div>` : ''}
+      ${mat.rewrite ? `
+      <div class="mat-rewrite">
+        <div class="mat-rewrite-label">Rewrite</div>
+        <div class="mat-rewrite-text">"${mat.rewrite}"</div>
+      </div>` : ''}`;
     mp.appendChild(panel);
   });
 
