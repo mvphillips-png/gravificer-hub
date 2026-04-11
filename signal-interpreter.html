@@ -360,6 +360,59 @@
     line-height: 1.7;
   }
 
+  .verdict-panel {
+    background: var(--card2);
+    border: 1px solid rgba(255,170,0,0.25);
+    border-radius: var(--radius);
+    padding: 22px 20px;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+
+  .verdict-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    opacity: 0.8;
+  }
+
+  .verdict-text {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(16px, 4vw, 22px);
+    font-weight: 700;
+    color: var(--amber);
+    line-height: 1.3;
+  }
+
+  .question-panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid rgba(230,237,243,0.2);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 16px 18px;
+    margin-bottom: 12px;
+  }
+
+  .question-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--faint);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .question-text {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--muted);
+    line-height: 1.7;
+    font-style: italic;
+  }
+
   .panel-noise { border-top: 3px solid var(--magenta); }
   .panel-signal { border-top: 3px solid var(--accent); }
   .panel-reframe { border-top: 3px solid var(--amber); }
@@ -466,6 +519,16 @@
       </div>
       <div class="panel-body panel-reframe" id="out-reframe"></div>
     </div>
+
+    <div class="verdict-panel">
+      <div class="verdict-label">Gravificer Transmission</div>
+      <div class="verdict-text" id="out-verdict"></div>
+    </div>
+
+    <div class="question-panel">
+      <div class="question-label">Signal Question</div>
+      <div class="question-text" id="out-question"></div>
+    </div>
   </div>
 
   <div class="footer">
@@ -494,24 +557,24 @@ function showErr(msg) {
 
 function hideErr() { document.getElementById('error-msg').classList.remove('visible'); }
 
-const SYS = `You are the Gravificer Signal Interpreter.
+const SYS = `You are the Gravificer Signal Interpreter — an intelligence engine built on the Gravificer philosophy: transform art, energy, and knowledge into intentional signals that shape perception. Every output must clarify, reveal, or reframe — otherwise it is noise. Simplicity carries power. No filler, no generic phrasing.
 
-Gravificer philosophy: Every output must clarify, reveal, or reframe — otherwise it is noise.
+Your task: analyze whatever the user submits — a word, phrase, idea, problem, or situation — and return a structured JSON object with exactly these five fields:
 
-Given any input — a word, phrase, situation, belief, or creative block — strip it to its three layers:
+- noise: What false signal, distortion, or mental fog surrounds this? What is the person probably telling themselves that obscures the real issue? Be specific and direct. 2-3 sentences.
+- signal: What is actually true here — the core signal beneath the surface? Strip away emotion, assumption, and habit. What is the real force at work? 2-3 sentences.
+- reframe: A single, powerful reframe statement that shifts perspective toward possibility. Find the empowering truth hidden inside the situation and deliver it with warmth, forward momentum, and a light touch of humor — not a joke, but the kind of wit that makes someone smile and think at the same time. This is the Gravificer transmission — make it memorable, precise, and energizing. The person should feel clearer, more capable, and slightly delighted after reading it. 1-2 sentences max.
+- verdict: A punchy, unforgettable closing declaration — 10 words or fewer. This is the signal distilled to its sharpest form. Like a frequency marker, not a summary.
+- question: One precise question the person should sit with. Not rhetorical. A real question that unlocks the next move. One sentence.
 
-NOISE: The false signal layered over the thing. What people misread, project onto it, or use to avoid looking directly at it.
-SIGNAL: What's actually true beneath the noise. The real force, tension, or structure at work.
-REFRAME: A single sentence that shifts the stakes — a new way of seeing that changes what's possible.
-
-Return ONLY a valid JSON object — no markdown, no backticks:
+Respond ONLY with a valid JSON object in this format (no markdown, no preamble, no explanation):
 {
-  "noise": "<2-3 sentences on the noise>",
-  "signal": "<2-3 sentences on the signal>",
-  "reframe": "<one powerful sentence — the reframe>"
-}
-
-Be precise. Be sharp. No filler. The reframe must land like a revelation.`;
+  "noise": "...",
+  "signal": "...",
+  "reframe": "...",
+  "verdict": "...",
+  "question": "..."
+}`;
 
 async function runInterpret() {
   hideErr();
@@ -531,7 +594,7 @@ async function runInterpret() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 800,
+        max_tokens: 1000,
         system: SYS,
         messages: [{ role: 'user', content: text }]
       })
@@ -548,6 +611,8 @@ async function runInterpret() {
     document.getElementById('out-noise').textContent = parsed.noise || '';
     document.getElementById('out-signal').textContent = parsed.signal || '';
     document.getElementById('out-reframe').textContent = parsed.reframe || '';
+    document.getElementById('out-verdict').textContent = parsed.verdict || '';
+    document.getElementById('out-question').textContent = parsed.question || '';
 
     document.getElementById('output').classList.add('visible');
     setTimeout(() => {
