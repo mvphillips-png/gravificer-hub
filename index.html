@@ -5,19 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Gravificer — Instrument Hub</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Exo+2:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg: #04060a;
-    --cyan: #00ffff;
+    --bg: #0d1117;
+    --card: #161b22;
+    --card2: #1c2230;
+    --border: rgba(255,255,255,0.08);
+    --border-hover: rgba(255,255,255,0.16);
+    --text: #e6edf3;
+    --muted: rgba(230,237,243,0.55);
+    --faint: rgba(230,237,243,0.3);
+    --cyan: #00d4ff;
     --magenta: #ff0080;
     --amber: #ffaa00;
     --purple: #aa55ff;
+    --orange: #ff5500;
     --green: #00ff88;
-    --text: #e0e8f0;
-    --muted: rgba(224,232,240,0.5);
+    --radius: 14px;
+    --radius-sm: 8px;
   }
 
   html, body {
@@ -26,55 +34,6 @@
     font-family: 'Exo 2', sans-serif;
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
-  }
-
-  /* Grid background */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(0,255,255,0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,255,255,0.025) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* Scanlines */
-  body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: repeating-linear-gradient(
-      0deg, transparent, transparent 3px,
-      rgba(0,0,0,0.09) 3px, rgba(0,0,0,0.09) 4px
-    );
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* Ambient glow orbs */
-  .orb {
-    position: fixed;
-    border-radius: 50%;
-    filter: blur(80px);
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.12;
-  }
-
-  .orb-1 {
-    width: 400px; height: 400px;
-    background: var(--cyan);
-    top: -120px; left: -120px;
-  }
-
-  .orb-2 {
-    width: 300px; height: 300px;
-    background: var(--magenta);
-    bottom: -80px; right: -80px;
   }
 
   /* Nav */
@@ -82,11 +41,12 @@
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(4,6,10,0.90);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(0,255,255,0.1);
-    padding: 14px 20px;
+    background: rgba(13,17,23,0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    height: 56px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -94,423 +54,401 @@
 
   .nav-brand {
     font-family: 'Orbitron', monospace;
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 900;
-    letter-spacing: 4px;
-    color: #fff;
-    text-shadow: 0 0 20px rgba(0,255,255,0.4);
+    color: var(--text);
+    letter-spacing: 3px;
+    text-decoration: none;
   }
 
   .nav-brand span { color: var(--magenta); }
 
-  .nav-status {
+  .nav-pill {
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 6px;
+    background: rgba(0,255,136,0.1);
+    border: 1px solid rgba(0,255,136,0.2);
+    border-radius: 20px;
+    padding: 5px 12px;
   }
 
-  .status-dot {
-    width: 6px;
-    height: 6px;
+  .pulse {
+    width: 6px; height: 6px;
     background: var(--green);
     border-radius: 50%;
-    box-shadow: 0 0 6px var(--green);
     animation: pulse 2s ease-in-out infinite;
   }
 
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-  .status-label {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 2px;
-    color: rgba(0,255,136,0.6);
-    text-transform: uppercase;
+  .nav-pill span {
+    font-family: 'Exo 2', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--green);
+    letter-spacing: 1px;
   }
 
   /* Main */
   .main {
-    position: relative;
-    z-index: 1;
     max-width: 560px;
     margin: 0 auto;
-    padding: 36px 16px 72px;
+    padding: 48px 20px 80px;
   }
 
   /* Hero */
-  .hero {
-    text-align: center;
-    margin-bottom: 44px;
-  }
+  .hero { text-align: center; margin-bottom: 52px; }
 
-  .hero-eyebrow {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px;
+  .hero-eye {
+    font-family: 'Exo 2', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
     letter-spacing: 4px;
-    color: rgba(0,255,255,0.5);
+    color: var(--faint);
     text-transform: uppercase;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
   }
 
   .hero-title {
     font-family: 'Orbitron', monospace;
-    font-size: clamp(28px, 8vw, 44px);
+    font-size: clamp(32px, 9vw, 52px);
     font-weight: 900;
-    color: #fff;
-    letter-spacing: 3px;
-    line-height: 1.05;
-    text-shadow:
-      0 0 30px rgba(255,0,128,0.5),
-      0 0 60px rgba(0,255,255,0.2);
-    margin-bottom: 6px;
+    letter-spacing: 4px;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 8px;
   }
 
   .hero-title span { color: var(--magenta); }
 
-  .hero-tagline {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: rgba(0,255,255,0.4);
-    margin-bottom: 20px;
+  .hero-sub {
+    font-family: 'Exo 2', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 3px;
+    color: var(--faint);
+    text-transform: uppercase;
+    margin-bottom: 24px;
   }
 
-  .hero-description {
-    font-family: 'Exo 2', sans-serif;
-    font-size: 14px;
-    color: rgba(224,232,240,0.6);
-    line-height: 1.75;
-    max-width: 380px;
+  .hero-desc {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.8;
+    max-width: 400px;
     margin: 0 auto;
   }
 
   /* Section */
-  .section-header {
+  .section-row {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
+    gap: 14px;
+    margin-bottom: 20px;
   }
 
-  .section-label {
-    font-family: 'Orbitron', monospace;
-    font-size: 9px;
+  .section-title {
+    font-family: 'Exo 2', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
     letter-spacing: 3px;
-    color: rgba(0,255,255,0.5);
+    color: var(--faint);
     text-transform: uppercase;
+    white-space: nowrap;
   }
 
   .section-line {
     flex: 1;
     height: 1px;
-    background: rgba(0,255,255,0.1);
+    background: var(--border);
   }
 
-  /* Instrument grid */
-  .instrument-grid {
+  /* Grid */
+  .grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 14px;
-    margin-bottom: 36px;
+    gap: 12px;
+    margin-bottom: 40px;
   }
 
-  @media (min-width: 480px) {
-    .instrument-grid { grid-template-columns: 1fr 1fr; }
+  @media(min-width: 460px) {
+    .grid { grid-template-columns: 1fr 1fr; }
   }
 
-  /* Instrument card */
-  .instrument-card {
+  /* Card */
+  .card {
     display: block;
     text-decoration: none;
-    background: rgba(255,255,255,0.025);
-    border: 1px solid rgba(0,255,255,0.12);
-    border-radius: 10px;
-    padding: 20px;
-    transition: all 0.2s;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 20px 20px;
     position: relative;
     overflow: hidden;
+    transition: border-color 0.2s, background 0.2s;
     -webkit-tap-highlight-color: transparent;
-    cursor: pointer;
   }
 
-  .instrument-card::before {
+  .card::before {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--card-accent, #00ffff), transparent);
-    opacity: 0.6;
+    height: 3px;
+    background: var(--accent, #00d4ff);
+    opacity: 0.7;
+    border-radius: var(--radius) var(--radius) 0 0;
   }
 
-  .instrument-card:active {
+  .card:not(.disabled):active {
+    background: var(--card2);
+    border-color: var(--accent, #00d4ff);
     transform: scale(0.97);
-    border-color: var(--card-accent, #00ffff);
-    background: rgba(255,255,255,0.05);
   }
 
-  @media (hover: hover) {
-    .instrument-card:hover {
-      border-color: var(--card-accent, #00ffff);
-      background: rgba(255,255,255,0.045);
-      box-shadow: 0 0 24px rgba(0,255,255,0.08);
+  @media(hover:hover) {
+    .card:not(.disabled):hover {
+      background: var(--card2);
+      border-color: var(--border-hover);
     }
   }
 
-  .instrument-card.coming-soon {
-    opacity: 0.42;
+  .card.disabled {
+    opacity: 0.4;
     cursor: default;
     pointer-events: none;
   }
 
   .card-num {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
     letter-spacing: 2px;
-    color: var(--card-accent, #00ffff);
-    margin-bottom: 12px;
+    color: var(--accent, #00d4ff);
+    text-transform: uppercase;
+    margin-bottom: 14px;
     opacity: 0.7;
   }
 
   .card-icon {
-    font-size: 22px;
-    margin-bottom: 12px;
-    line-height: 1;
+    width: 36px; height: 36px;
+    background: color-mix(in srgb, var(--accent, #00d4ff) 15%, transparent);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+    font-size: 16px;
   }
 
   .card-title {
     font-family: 'Orbitron', monospace;
     font-size: 13px;
     font-weight: 700;
-    color: #fff;
+    color: var(--text);
     letter-spacing: 1px;
-    margin-bottom: 6px;
-    line-height: 1.2;
+    margin-bottom: 5px;
+    line-height: 1.25;
   }
 
-  .card-function {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 1px;
-    color: var(--card-accent, #00ffff);
-    margin-bottom: 10px;
+  .card-fn {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--accent, #00d4ff);
+    text-transform: uppercase;
+    margin-bottom: 12px;
     opacity: 0.65;
   }
 
   .card-desc {
-    font-family: 'Exo 2', sans-serif;
     font-size: 12px;
-    color: rgba(224,232,240,0.55);
-    line-height: 1.6;
+    color: var(--muted);
+    line-height: 1.65;
+    margin-bottom: 16px;
   }
 
-  .card-badge {
-    display: inline-block;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 8px;
-    letter-spacing: 2px;
-    padding: 4px 8px;
-    border-radius: 3px;
-    margin-top: 12px;
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    padding: 4px 10px;
+    border-radius: 20px;
     text-transform: uppercase;
   }
 
   .badge-live {
-    background: rgba(0,255,136,0.1);
+    background: rgba(0,255,136,0.12);
     color: var(--green);
     border: 1px solid rgba(0,255,136,0.25);
   }
 
   .badge-soon {
-    background: rgba(255,170,0,0.08);
+    background: rgba(255,170,0,0.1);
     color: var(--amber);
     border: 1px solid rgba(255,170,0,0.2);
   }
 
   .card-arrow {
     position: absolute;
-    bottom: 18px;
-    right: 18px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 14px;
-    color: var(--card-accent, #00ffff);
-    opacity: 0.4;
+    bottom: 20px; right: 20px;
+    font-size: 16px;
+    color: var(--accent, #00d4ff);
+    opacity: 0.35;
     transition: opacity 0.2s, transform 0.2s;
   }
 
-  .instrument-card:hover .card-arrow,
-  .instrument-card:active .card-arrow {
-    opacity: 0.9;
-    transform: translate(2px, -2px);
+  .card:not(.disabled):hover .card-arrow,
+  .card:not(.disabled):active .card-arrow {
+    opacity: 0.8;
+    transform: translate(2px,-2px);
   }
 
-  /* Philosophy strip */
+  /* Philosophy */
   .philosophy {
-    background: rgba(255,255,255,0.02);
-    border: 1px solid rgba(255,0,128,0.15);
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 36px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 20px;
+    margin-bottom: 40px;
   }
 
-  .philosophy-label {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 3px;
-    color: rgba(255,0,128,0.5);
-    text-transform: uppercase;
-    margin-bottom: 10px;
-  }
-
-  .philosophy-text {
-    font-family: 'Exo 2', sans-serif;
-    font-size: 13px;
-    color: rgba(224,232,240,0.65);
-    line-height: 1.75;
-  }
-
-  .philosophy-text strong {
-    color: rgba(224,232,240,0.9);
+  .phil-label {
+    font-size: 10px;
     font-weight: 600;
+    letter-spacing: 3px;
+    color: var(--magenta);
+    text-transform: uppercase;
+    opacity: 0.65;
+    margin-bottom: 12px;
   }
+
+  .phil-text {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+
+  .phil-text strong { color: var(--text); font-weight: 600; }
 
   /* Footer */
-  .footer {
-    text-align: center;
-    padding-top: 24px;
-    border-top: 1px solid rgba(0,255,255,0.06);
-  }
+  .footer { text-align: center; padding-top: 32px; border-top: 1px solid var(--border); }
 
   .footer-brand {
     font-family: 'Orbitron', monospace;
-    font-size: 10px;
+    font-size: 11px;
+    font-weight: 700;
     letter-spacing: 4px;
-    color: rgba(0,255,255,0.18);
+    color: var(--faint);
   }
 
-  .footer-brand span { color: rgba(255,0,128,0.22); }
+  .footer-brand span { color: rgba(255,0,128,0.4); }
 
   .footer-sub {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 2px;
-    color: rgba(224,232,240,0.18);
+    font-size: 11px;
+    color: rgba(230,237,243,0.2);
     margin-top: 6px;
+    letter-spacing: 2px;
   }
 </style>
 </head>
 <body>
 
-<div class="orb orb-1"></div>
-<div class="orb orb-2"></div>
-
 <nav class="nav">
   <div class="nav-brand">GRAVIFI<span>CER</span></div>
-  <div class="nav-status">
-    <div class="status-dot"></div>
-    <div class="status-label">SYSTEMS LIVE</div>
+  <div class="nav-pill">
+    <div class="pulse"></div>
+    <span>Systems Live</span>
   </div>
 </nav>
 
 <main class="main">
 
   <div class="hero">
-    <div class="hero-eyebrow">▸ SIGNAL ARCHITECTURE</div>
+    <div class="hero-eye">Signal Architecture</div>
     <h1 class="hero-title">GRAVI<span>FICER</span></h1>
-    <div class="hero-tagline">TRANSFORM · CLARIFY · REFRAME</div>
-    <p class="hero-description">
-      A set of precision instruments for turning art, energy, and knowledge into intentional signals that shape perception. Every output must clarify, reveal, or reframe — otherwise it is noise.
-    </p>
+    <div class="hero-sub">Transform · Clarify · Reframe</div>
+    <p class="hero-desc">Precision instruments for turning art, energy, and knowledge into intentional signals that shape perception. Every output must clarify, reveal, or reframe — otherwise it is noise.</p>
   </div>
 
-  <div class="section-header">
-    <div class="section-label">▸ ACTIVE INSTRUMENTS</div>
+  <div class="section-row">
+    <div class="section-title">Active Instruments</div>
     <div class="section-line"></div>
   </div>
 
-  <div class="instrument-grid">
+  <div class="grid">
 
-    <!-- Instrument 01: Signal Interpreter -->
-    <a class="instrument-card" href="signal-interpreter.html" style="--card-accent: #00ffff;">
-      <div class="card-num">INSTRUMENT 01</div>
+    <a class="card" href="signal-interpreter.html" style="--accent:#00d4ff;">
+      <div class="card-num">Instrument 01</div>
       <div class="card-icon">◈</div>
       <div class="card-title">SIGNAL INTERPRETER</div>
-      <div class="card-function">DECODE · CLASSIFY · MAP</div>
-      <div class="card-desc">Read any message, idea, or content through the four Gravificer materials. Reveals what kind of signal you're working with.</div>
-      <div class="card-badge badge-live">● LIVE</div>
+      <div class="card-fn">Decode · Classify · Map</div>
+      <div class="card-desc">Read any message through the four Gravificer materials. Reveals what kind of signal you're working with.</div>
+      <div class="badge badge-live"><span>●</span> Live</div>
       <div class="card-arrow">↗</div>
     </a>
 
-    <!-- Instrument 02: Noise Classifier -->
-    <a class="instrument-card" href="noise-classifier.html" style="--card-accent: #ff0080;">
-      <div class="card-num">INSTRUMENT 02</div>
+    <a class="card" href="noise-classifier.html" style="--accent:#ff0080;">
+      <div class="card-num">Instrument 02</div>
       <div class="card-icon">◉</div>
       <div class="card-title">NOISE CLASSIFIER</div>
-      <div class="card-function">DETECT · CATEGORIZE · REMOVE</div>
-      <div class="card-desc">Identifies and maps the noise in any written content. Returns a signal score, flagged phrases, and surgical removal actions.</div>
-      <div class="card-badge badge-live">● LIVE</div>
+      <div class="card-fn">Detect · Categorize · Remove</div>
+      <div class="card-desc">Identifies and maps noise in any written content. Returns a signal score, flagged phrases, and removal actions.</div>
+      <div class="badge badge-live"><span>●</span> Live</div>
       <div class="card-arrow">↗</div>
     </a>
 
-    <!-- Instrument 03: Signal Architect — coming soon -->
-    <div class="instrument-card coming-soon" style="--card-accent: #ffaa00;">
-      <div class="card-num">INSTRUMENT 03</div>
+    <div class="card disabled" style="--accent:#ffaa00;">
+      <div class="card-num">Instrument 03</div>
       <div class="card-icon">◧</div>
       <div class="card-title">SIGNAL ARCHITECT</div>
-      <div class="card-function">AUDIT · BALANCE · STRENGTHEN</div>
-      <div class="card-desc">Breaks any message down across the four materials and shows what's missing, overloaded, or cutting against the signal.</div>
-      <div class="card-badge badge-soon">COMING SOON</div>
+      <div class="card-fn">Audit · Balance · Strengthen</div>
+      <div class="card-desc">Breaks any message across the four materials. Shows what's missing, overloaded, or cutting against the signal.</div>
+      <div class="badge badge-soon">Coming Soon</div>
     </div>
 
-    <!-- Instrument 04: Lens Engine — coming soon -->
-    <div class="instrument-card coming-soon" style="--card-accent: #aa55ff;">
-      <div class="card-num">INSTRUMENT 04</div>
+    <div class="card disabled" style="--accent:#aa55ff;">
+      <div class="card-num">Instrument 04</div>
       <div class="card-icon">◎</div>
       <div class="card-title">LENS ENGINE</div>
-      <div class="card-function">REFRAME · SHIFT · REVEAL</div>
-      <div class="card-desc">Forces perception shifts on any problem or situation. Generates 3–5 reframes through power, time, scale, and inversion lenses.</div>
-      <div class="card-badge badge-soon">COMING SOON</div>
+      <div class="card-fn">Reframe · Shift · Reveal</div>
+      <div class="card-desc">Generates 3–5 perception shifts on any problem through power, time, scale, and inversion lenses.</div>
+      <div class="badge badge-soon">Coming Soon</div>
     </div>
 
-    <!-- Instrument 05: Faction Scanner — coming soon -->
-    <div class="instrument-card coming-soon" style="--card-accent: #ff5500;">
-      <div class="card-num">INSTRUMENT 05</div>
+    <div class="card disabled" style="--accent:#ff5500;">
+      <div class="card-num">Instrument 05</div>
       <div class="card-icon">◬</div>
       <div class="card-title">FACTION SCANNER</div>
-      <div class="card-function">ASSESS · PLACE · PROFILE</div>
-      <div class="card-desc">Maps your signal behavior to the Krovxar/Lattice factions — Architects, Tuned, or Static. A mirror for how you process reality.</div>
-      <div class="card-badge badge-soon">COMING SOON</div>
+      <div class="card-fn">Assess · Place · Profile</div>
+      <div class="card-desc">Maps your signal behavior to the Krovxar factions — Architects, Tuned, or Static.</div>
+      <div class="badge badge-soon">Coming Soon</div>
     </div>
 
-    <!-- Instrument 06: Pattern Extractor — coming soon -->
-    <div class="instrument-card coming-soon" style="--card-accent: #00ff88;">
-      <div class="card-num">INSTRUMENT 06</div>
+    <div class="card disabled" style="--accent:#00ff88;">
+      <div class="card-num">Instrument 06</div>
       <div class="card-icon">◆</div>
       <div class="card-title">PATTERN EXTRACTOR</div>
-      <div class="card-function">SURFACE · STRUCTURE · SHARPEN</div>
-      <div class="card-desc">Surfaces recurring patterns, hidden structures, and tension points from any text or system. The Patterns pillar made operational.</div>
-      <div class="card-badge badge-soon">COMING SOON</div>
+      <div class="card-fn">Surface · Structure · Sharpen</div>
+      <div class="card-desc">Surfaces recurring patterns, hidden structures, and tension points from any text or system.</div>
+      <div class="badge badge-soon">Coming Soon</div>
     </div>
 
   </div>
 
   <div class="philosophy">
-    <div class="philosophy-label">▸ OPERATING PRINCIPLE</div>
-    <p class="philosophy-text">
-      Gravificer transforms art, energy, and knowledge into intentional signals that shape perception.
-      <strong>Every output must clarify, reveal, or reframe — otherwise it is noise.</strong>
-      Balance energy with structure. Knowledge is raw material to reshape, not repeat. Simplicity carries power.
-    </p>
+    <div class="phil-label">Operating Principle</div>
+    <p class="phil-text">Gravificer transforms art, energy, and knowledge into intentional signals that shape perception. <strong>Every output must clarify, reveal, or reframe — otherwise it is noise.</strong> Balance energy with structure. Knowledge is raw material to reshape, not repeat.</p>
   </div>
 
   <div class="footer">
     <div class="footer-brand">GRAVIFI<span>CER</span></div>
-    <div class="footer-sub">SIGNAL ARCHITECTURE · MVANNP</div>
+    <div class="footer-sub">Signal Architecture · MVANNP</div>
   </div>
 
 </main>
-
 </body>
 </html>
