@@ -458,6 +458,67 @@
     line-height: 1.55;
   }
 
+  .flag-examples {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+
+  .flag-examples-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--faint);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .flag-example-item {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    margin-bottom: 6px;
+  }
+
+  .flag-example-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 8px;
+  }
+
+  .flag-example-text {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+
+  .flag-rewrite {
+    margin-top: 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+  }
+
+  .flag-rewrite-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--faint);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .flag-rewrite-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.6;
+    font-style: italic;
+  }
+
   .flag-type-tag {
     display: inline-block;
     font-size: 10px;
@@ -707,7 +768,13 @@ Return ONLY a valid JSON object — no markdown, no backticks, no preamble:
     { "name": "<category>", "count": <integer> }
   ],
   "flagged": [
-    { "phrase": "<exact or near-exact phrase>", "type": "<category>", "reason": "<short reason>" }
+    {
+      "phrase": "<exact or near-exact phrase>",
+      "type": "<category>",
+      "reason": "<short reason why it is noise>",
+      "examples": ["<a stronger alternative phrase or approach>", "<second alternative>"],
+      "rewrite": "<rewrite the flagged phrase or its surrounding sentence as clean signal>"
+    }
   ],
   "removals": [
     "<specific actionable instruction>"
@@ -721,7 +788,7 @@ Noise categories (only include what is present):
 - Generic Framing: could-apply-to-anything openers/closers
 - Overload: too many ideas in one sentence
 
-Return 3–6 flagged phrases. Return 3–5 specific removal actions. Be surgical and direct.`;
+Return 3–6 flagged phrases. Each flagged phrase must include 2 specific alternative examples and a clean rewrite. Return 3–5 specific removal actions. Be surgical and direct.`;
 
 async function runAnalysis() {
   hideErr();
@@ -741,7 +808,7 @@ async function runAnalysis() {
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
+        max_tokens:1600,
         system:SYS,
         messages:[{role:'user',content:'Analyze:\n\n'+text}]
       })
@@ -808,10 +875,27 @@ function render(d) {
     const item=document.createElement('div');
     item.className='flag-item';
     item.style.borderLeftColor=col;
+
+    const examplesHtml = (f.examples||[]).map(ex=>`
+      <div class="flag-example-item">
+        <div class="flag-example-dot" style="background:${col};"></div>
+        <div class="flag-example-text">${ex}</div>
+      </div>`).join('');
+
     item.innerHTML=`
       <div class="flag-type-tag" style="background:${col}22;color:${col};">${f.type}</div>
       <div class="flag-phrase">"${f.phrase}"</div>
-      <div class="flag-reason">${f.reason}</div>`;
+      <div class="flag-reason">${f.reason}</div>
+      ${examplesHtml ? `
+      <div class="flag-examples">
+        <div class="flag-examples-label">Stronger alternatives</div>
+        ${examplesHtml}
+      </div>` : ''}
+      ${f.rewrite ? `
+      <div class="flag-rewrite">
+        <div class="flag-rewrite-label">Rewrite</div>
+        <div class="flag-rewrite-text">"${f.rewrite}"</div>
+      </div>` : ''}`;
     fl.appendChild(item);
   });
 
