@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Lens Engine — Gravificer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Exo+2:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d1117;
+    --card: #161b22;
+    --card2: #1c2230;
+    --border: rgba(255,255,255,0.08);
+    --text: #e6edf3;
+    --muted: rgba(230,237,243,0.55);
+    --faint: rgba(230,237,243,0.3);
+    --accent: #aa55ff;
+    --accent-dim: rgba(170,85,255,0.12);
+    --magenta: #ff0080;
+    --cyan: #00d4ff;
+    --amber: #ffaa00;
+    --green: #00ff88;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Exo 2', sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(13,17,23,0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-brand {
+    font-family: 'Orbitron', monospace;
+    font-size: 15px;
+    font-weight: 900;
+    color: var(--text);
+    letter-spacing: 3px;
+    text-decoration: none;
+  }
+
+  .nav-brand span { color: var(--magenta); }
+
+  .nav-back {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .nav-back:active { background: var(--card); color: var(--text); }
+
+  .main {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 36px 20px 80px;
+  }
+
+  .header { text-align: center; margin-bottom: 32px; }
+
+  .header-eye {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    color: var(--faint);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .header-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(20px, 6.5vw, 30px);
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: var(--text);
+    margin-bottom: 4px;
+    line-height: 1.1;
+  }
+
+  .header-title span { color: var(--accent); }
+
+  .header-sub {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 3px;
+    color: var(--faint);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .header-desc {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.75;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  /* Lens legend */
+  .lens-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .lens-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 11px 14px;
+  }
+
+  .lens-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent);
+    min-width: 20px;
+    opacity: 0.7;
+  }
+
+  .lens-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text);
+    min-width: 80px;
+  }
+
+  .lens-def {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+
+  /* Input */
+  .input-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 12px;
+  }
+
+  .field-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    opacity: 0.85;
+  }
+
+  .nc-textarea {
+    width: 100%;
+    background: #e8ecf0;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: var(--radius-sm);
+    color: #0d1117;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    padding: 14px 16px;
+    resize: none;
+    min-height: 130px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+  }
+
+  .nc-textarea::placeholder { color: #7a8794; }
+  .nc-textarea:focus {
+    border-color: rgba(170,85,255,0.5);
+    box-shadow: 0 0 0 3px rgba(170,85,255,0.1);
+  }
+
+  .char-count {
+    font-size: 11px;
+    color: var(--faint);
+    text-align: right;
+    margin-top: 8px;
+  }
+
+  .cta-btn {
+    width: 100%;
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius);
+    color: #fff;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 58px;
+  }
+
+  .cta-btn:active:not(:disabled) { transform: scale(0.97); opacity: 0.85; }
+  .cta-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  .error-msg {
+    background: rgba(255,0,80,0.1);
+    border: 1px solid rgba(255,0,80,0.25);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    font-size: 13px;
+    color: #ff5080;
+    text-align: center;
+    display: none;
+    margin-top: 12px;
+    line-height: 1.6;
+  }
+
+  .error-msg.visible { display: block; }
+
+  .loading { display: none; text-align: center; padding: 36px 20px; }
+  .loading.visible { display: block; }
+
+  .loading-bar {
+    width: 100%;
+    height: 3px;
+    background: var(--card);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 0 0 14px;
+  }
+
+  .loading-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--cyan));
+    border-radius: 2px;
+    animation: load 2s ease-in-out infinite;
+  }
+
+  @keyframes load {
+    0%{width:0%;margin-left:0}
+    50%{width:55%;margin-left:25%}
+    100%{width:0%;margin-left:100%}
+  }
+
+  .loading-label {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    color: var(--faint);
+    text-transform: uppercase;
+  }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+
+  .output { display: none; }
+  .output.visible { display: block; }
+
+  .sec-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    color: var(--faint);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  /* Received */
+  .received-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 14px 16px;
+    margin-bottom: 4px;
+  }
+
+  .received-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    opacity: 0.7;
+  }
+
+  .received-text {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  /* Lens cards */
+  .lens-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+
+  .lens-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .lens-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .lens-card-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 900;
+    color: var(--accent);
+    min-width: 28px;
+    opacity: 0.6;
+  }
+
+  .lens-card-icon {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    background: var(--accent-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .lens-card-meta { flex: 1; min-width: 0; }
+
+  .lens-card-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .lens-card-question {
+    font-size: 11px;
+    color: var(--muted);
+    font-style: italic;
+    line-height: 1.4;
+  }
+
+  .lens-card-body {
+    padding: 16px 18px;
+  }
+
+  .lens-card-reframe {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.7;
+    margin-bottom: 10px;
+  }
+
+  .lens-card-detail {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+
+  /* Sharpest reframe */
+  .sharpest {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 22px 20px;
+    margin-bottom: 4px;
+  }
+
+  .sharpest-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    opacity: 0.8;
+  }
+
+  .sharpest-text {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.65;
+  }
+
+  .footer {
+    text-align: center;
+    margin-top: 52px;
+    padding-top: 28px;
+    border-top: 1px solid var(--border);
+  }
+
+  .footer-brand {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: var(--faint);
+  }
+
+  .footer-brand span { color: rgba(255,0,128,0.5); }
+  .footer-sub { font-size: 11px; color: rgba(230,237,243,0.2); margin-top: 6px; letter-spacing: 2px; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-brand" href="index.html">GRAVIFI<span>CER</span></a>
+  <a class="nav-back" href="index.html">← Hub</a>
+</nav>
+
+<main class="main">
+
+  <div class="header">
+    <div class="header-eye">Instrument 04</div>
+    <h1 class="header-title">LENS <span>ENGINE</span></h1>
+    <div class="header-sub">Reframe · Shift · Reveal</div>
+    <p class="header-desc">Drop in any problem, situation, or idea. The Lens Engine forces it through five distinct perceptual lenses — returning reframes that change what's visible and what's possible.</p>
+  </div>
+
+  <div class="lens-legend">
+    <div class="lens-row">
+      <div class="lens-num">01</div>
+      <div class="lens-name">Power</div>
+      <div class="lens-def">Who controls this? Who benefits? What leverage exists?</div>
+    </div>
+    <div class="lens-row">
+      <div class="lens-num">02</div>
+      <div class="lens-name">Time</div>
+      <div class="lens-def">How does this look in 10 days, 10 months, 10 years?</div>
+    </div>
+    <div class="lens-row">
+      <div class="lens-num">03</div>
+      <div class="lens-name">Scale</div>
+      <div class="lens-def">What changes if this is 10x smaller or 10x larger?</div>
+    </div>
+    <div class="lens-row">
+      <div class="lens-num">04</div>
+      <div class="lens-name">Inversion</div>
+      <div class="lens-def">What if the opposite were true? What does that reveal?</div>
+    </div>
+    <div class="lens-row">
+      <div class="lens-num">05</div>
+      <div class="lens-name">Relationship</div>
+      <div class="lens-def">What does this look like from every other perspective?</div>
+    </div>
+  </div>
+
+  <div class="input-card">
+    <div class="field-label">Situation / Problem / Idea</div>
+    <textarea class="nc-textarea" id="lens-input" maxlength="500"
+      placeholder="Type anything — a decision you're stuck on, a creative block, a conflict, a belief, a strategy, a situation..."
+      oninput="updateCount()"></textarea>
+    <div class="char-count"><span id="char-count">0</span> / 500</div>
+  </div>
+
+  <button class="cta-btn" id="lens-btn" onclick="runLens()">Run Lenses →</button>
+  <div class="error-msg" id="error-msg"></div>
+
+  <div class="loading" id="loading">
+    <div class="loading-bar"><div class="loading-fill"></div></div>
+    <div class="loading-label" id="loading-label">Engaging lens 01...</div>
+  </div>
+
+  <div class="output" id="output">
+    <hr class="divider">
+
+    <div class="sec-label">Input</div>
+    <div class="received-card">
+      <div class="received-label">Situation</div>
+      <div class="received-text" id="received-text"></div>
+    </div>
+
+    <hr class="divider">
+    <div class="sec-label">Five Lenses</div>
+    <div class="lens-cards" id="lens-cards"></div>
+
+    <hr class="divider">
+    <div class="sec-label">Sharpest Reframe</div>
+    <div class="sharpest">
+      <div class="sharpest-label">The Lens That Changes Everything</div>
+      <div class="sharpest-text" id="sharpest-text"></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-brand">GRAVIFI<span>CER</span></div>
+    <div class="footer-sub">Instrument 04 · MVANNP</div>
+  </div>
+
+</main>
+
+<script>
+const LENS_META = [
+  { num: '01', name: 'Power',        icon: '⚡', question: 'Who controls this? Where is the leverage?' },
+  { num: '02', name: 'Time',         icon: '◷', question: 'How does this look across 10 days, months, years?' },
+  { num: '03', name: 'Scale',        icon: '⊞', question: 'What changes at 10x smaller or 10x larger?' },
+  { num: '04', name: 'Inversion',    icon: '↺', question: 'What if the opposite were true?' },
+  { num: '05', name: 'Relationship', icon: '◎', question: 'What does this look like from every other angle?' },
+];
+
+function updateCount() {
+  document.getElementById('char-count').textContent =
+    document.getElementById('lens-input').value.length;
+}
+
+function setLoad(on, msg) {
+  document.getElementById('loading').classList.toggle('visible', on);
+  document.getElementById('lens-btn').disabled = on;
+  if (msg) document.getElementById('loading-label').textContent = msg;
+}
+
+function showErr(msg) {
+  const e = document.getElementById('error-msg');
+  e.textContent = msg; e.classList.add('visible');
+}
+
+function hideErr() { document.getElementById('error-msg').classList.remove('visible'); }
+
+const SYS = `You are the Gravificer Lens Engine — a precision instrument for forcing perception shifts.
+
+Given any problem, situation, belief, or idea, you apply five distinct perceptual lenses. Each lens reveals something the default view cannot see.
+
+The five lenses:
+1. Power — Who controls this? Who benefits? Where is the real leverage or dependency?
+2. Time — How does this look in 10 days, 10 months, 10 years? What does time reveal or dissolve?
+3. Scale — What changes if this is 10x smaller? 10x larger? What does scale expose about the assumptions?
+4. Inversion — What if the opposite were true? What does inverting the premise reveal?
+5. Relationship — What does this look like from every other stakeholder's, observer's, or opponent's perspective?
+
+Gravificer philosophy: Every output must clarify, reveal, or reframe — otherwise it is noise.
+
+Return ONLY a valid JSON object — no markdown, no backticks, no preamble:
+
+{
+  "lenses": {
+    "power":        { "reframe": "<one sharp sentence — the reframe this lens delivers>", "detail": "<2 sentences expanding on what this lens reveals>" },
+    "time":         { "reframe": "<one sharp sentence>", "detail": "<2 sentences>" },
+    "scale":        { "reframe": "<one sharp sentence>", "detail": "<2 sentences>" },
+    "inversion":    { "reframe": "<one sharp sentence>", "detail": "<2 sentences>" },
+    "relationship": { "reframe": "<one sharp sentence>", "detail": "<2 sentences>" }
+  },
+  "sharpest": "<The single most powerful reframe across all five lenses — one sentence that changes what is possible>"
+}
+
+Each reframe must be specific to the input. No generic observations. The sharpest reframe should feel like a revelation.`;
+
+async function runLens() {
+  hideErr();
+  const text = document.getElementById('lens-input').value.trim();
+  if (!text) { showErr('No input detected. Describe a situation or problem to reframe.'); return; }
+
+  document.getElementById('output').classList.remove('visible');
+  setLoad(true, 'Engaging lens 01...');
+
+  const msgs = [
+    'Engaging lens 01 — Power...',
+    'Engaging lens 02 — Time...',
+    'Engaging lens 03 — Scale...',
+    'Engaging lens 04 — Inversion...',
+    'Engaging lens 05 — Relationship...',
+  ];
+  let mi = 0;
+  const t = setInterval(() => {
+    mi = Math.min(mi + 1, msgs.length - 1);
+    document.getElementById('loading-label').textContent = msgs[mi];
+  }, 1600);
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1200,
+        system: SYS,
+        messages: [{ role: 'user', content: 'Apply all five lenses to:\n\n' + text }]
+      })
+    });
+
+    clearInterval(t); setLoad(false);
+    if (!res.ok) throw new Error('API ' + res.status);
+
+    const data = await res.json();
+    const raw = data.content.map(b => b.text || '').join('');
+    render(text, JSON.parse(raw.replace(/```json|```/g, '').trim()));
+  } catch(e) {
+    clearInterval(t); setLoad(false);
+    showErr('Lens failed. Check your connection and try again.');
+    console.error(e);
+  }
+}
+
+const LENS_KEYS = ['power','time','scale','inversion','relationship'];
+
+function render(input, d) {
+  document.getElementById('received-text').textContent = input;
+
+  const lenses = d.lenses || {};
+  const container = document.getElementById('lens-cards');
+  container.innerHTML = '';
+
+  LENS_META.forEach((meta, i) => {
+    const lens = lenses[meta.name.toLowerCase()] || {};
+    const card = document.createElement('div');
+    card.className = 'lens-card';
+    card.style.borderTop = '3px solid var(--accent)';
+    card.innerHTML = `
+      <div class="lens-card-header">
+        <div class="lens-card-num">${meta.num}</div>
+        <div class="lens-card-icon">${meta.icon}</div>
+        <div class="lens-card-meta">
+          <div class="lens-card-name">${meta.name.toUpperCase()}</div>
+          <div class="lens-card-question">${meta.question}</div>
+        </div>
+      </div>
+      <div class="lens-card-body">
+        <div class="lens-card-reframe">${lens.reframe || ''}</div>
+        <div class="lens-card-detail">${lens.detail || ''}</div>
+      </div>`;
+    container.appendChild(card);
+  });
+
+  document.getElementById('sharpest-text').textContent = d.sharpest || '';
+  document.getElementById('output').classList.add('visible');
+  setTimeout(() => {
+    document.getElementById('output').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+</script>
+</body>
+</html>
