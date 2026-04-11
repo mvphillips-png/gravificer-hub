@@ -5,20 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Noise Classifier — Gravificer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Exo+2:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg: #04060a;
-    --cyan: #00ffff;
-    --magenta: #ff0080;
+    --bg: #0d1117;
+    --card: #161b22;
+    --card2: #1c2230;
+    --border: rgba(255,255,255,0.08);
+    --border-active: rgba(255,0,128,0.4);
+    --text: #e6edf3;
+    --muted: rgba(230,237,243,0.55);
+    --faint: rgba(230,237,243,0.3);
+    --accent: #ff0080;
+    --accent-dim: rgba(255,0,128,0.15);
+    --cyan: #00d4ff;
     --amber: #ffaa00;
-    --purple: #aa55ff;
-    --surface: rgba(255,255,255,0.03);
-    --border: rgba(0,255,255,0.15);
-    --text: #e0e8f0;
-    --muted: rgba(224,232,240,0.55);
+    --green: #00ff88;
+    --radius: 14px;
+    --radius-sm: 8px;
   }
 
   html, body {
@@ -29,46 +35,17 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  body {
-    position: relative;
-    overflow-x: hidden;
-  }
-
-  /* Grid + scanline backgrounds */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(0,255,255,0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,255,255,0.025) 1px, transparent 1px);
-    background-size: 36px 36px;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: repeating-linear-gradient(
-      0deg, transparent, transparent 3px,
-      rgba(0,0,0,0.10) 3px, rgba(0,0,0,0.10) 4px
-    );
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* Nav bar */
+  /* Nav */
   .nav {
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(4,6,10,0.92);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border-bottom: 1px solid rgba(0,255,255,0.1);
-    padding: 12px 16px;
+    background: rgba(13,17,23,0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    height: 56px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -76,199 +53,209 @@
 
   .nav-brand {
     font-family: 'Orbitron', monospace;
-    font-size: 11px;
-    font-weight: 700;
+    font-size: 15px;
+    font-weight: 900;
+    color: var(--text);
     letter-spacing: 3px;
-    color: var(--cyan);
     text-decoration: none;
-    text-shadow: 0 0 12px rgba(0,255,255,0.4);
   }
+
+  .nav-brand span { color: var(--accent); }
 
   .nav-back {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: rgba(0,255,255,0.5);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
     text-decoration: none;
-    border: 1px solid rgba(0,255,255,0.2);
-    padding: 6px 12px;
-    border-radius: 3px;
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
     transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
   }
 
-  .nav-back:active { background: rgba(0,255,255,0.1); color: var(--cyan); }
+  .nav-back:active {
+    background: var(--card);
+    color: var(--text);
+  }
 
-  /* Main layout */
+  /* Main */
   .main {
-    position: relative;
-    z-index: 1;
-    max-width: 480px;
+    max-width: 520px;
     margin: 0 auto;
-    padding: 24px 16px 60px;
+    padding: 36px 20px 80px;
   }
 
   /* Header */
-  .header {
-    text-align: center;
-    margin-bottom: 28px;
-  }
+  .header { text-align: center; margin-bottom: 36px; }
 
-  .eyebrow {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px;
+  .header-eye {
+    font-size: 11px;
+    font-weight: 600;
     letter-spacing: 3px;
-    color: rgba(0,255,255,0.6);
+    color: var(--faint);
     text-transform: uppercase;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
   }
 
-  .title {
+  .header-title {
     font-family: 'Orbitron', monospace;
-    font-size: clamp(20px, 6vw, 26px);
+    font-size: clamp(22px, 7vw, 32px);
     font-weight: 900;
-    color: #fff;
     letter-spacing: 2px;
+    color: var(--text);
+    margin-bottom: 4px;
     line-height: 1.1;
-    text-shadow: 0 0 24px rgba(255,0,128,0.5), 0 0 48px rgba(0,255,255,0.2);
   }
 
-  .title span { color: var(--magenta); }
+  .header-title span { color: var(--accent); }
 
-  .subtitle {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 10px;
-    color: rgba(0,255,255,0.4);
-    letter-spacing: 2px;
-    margin-top: 8px;
+  .header-sub {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 3px;
+    color: var(--faint);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .header-desc {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.75;
+    max-width: 380px;
+    margin: 0 auto;
   }
 
   /* Mode toggle */
-  .mode-toggle {
+  .mode-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 4px;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    border: 1px solid rgba(0,255,255,0.2);
-    border-radius: 6px;
-    overflow: hidden;
-    margin-bottom: 20px;
+    gap: 4px;
+    margin-bottom: 16px;
   }
 
   .mode-btn {
     background: transparent;
     border: none;
-    border-right: 1px solid rgba(0,255,255,0.2);
-    color: rgba(0,255,255,0.4);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 2px;
-    padding: 14px 8px;
+    border-radius: 10px;
+    color: var(--muted);
+    font-family: 'Exo 2', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 12px;
     cursor: pointer;
-    text-transform: uppercase;
     transition: all 0.2s;
     -webkit-tap-highlight-color: transparent;
+    letter-spacing: 0.5px;
   }
-
-  .mode-btn:last-child { border-right: none; }
 
   .mode-btn.active {
-    background: rgba(0,255,255,0.1);
-    color: var(--cyan);
-    text-shadow: 0 0 8px rgba(0,255,255,0.5);
-  }
-
-  /* Input panels */
-  .input-panel {
-    background: var(--surface);
+    background: var(--card2);
+    color: var(--text);
     border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 16px;
-    margin-bottom: 14px;
   }
 
-  .input-panel.hidden { display: none; }
+  /* Input card */
+  .input-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 12px;
+  }
+
+  .input-card.hidden { display: none; }
 
   .field-label {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px;
+    font-size: 11px;
+    font-weight: 600;
     letter-spacing: 2px;
-    color: var(--magenta);
+    color: var(--accent);
     text-transform: uppercase;
-    margin-bottom: 8px;
-    opacity: 0.9;
+    margin-bottom: 10px;
+    opacity: 0.8;
   }
 
   .nc-textarea {
     width: 100%;
-    background: rgba(0,0,0,0.5);
-    border: 1px solid rgba(0,255,255,0.18);
-    border-radius: 6px;
-    color: var(--text);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 13px;
-    line-height: 1.75;
-    padding: 14px;
+    background: #e8ecf0;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: var(--radius-sm);
+    color: #0d1117;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    padding: 14px 16px;
     resize: none;
-    min-height: 130px;
+    min-height: 140px;
     outline: none;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s;
     -webkit-appearance: none;
   }
 
-  .nc-textarea:focus { border-color: rgba(0,255,255,0.45); }
+  .nc-textarea::placeholder { color: #7a8794; }
+  .nc-textarea:focus { border-color: rgba(255,0,128,0.5); box-shadow: 0 0 0 3px rgba(255,0,128,0.1); }
 
   .nc-input {
     width: 100%;
-    background: rgba(0,0,0,0.5);
-    border: 1px solid rgba(0,255,255,0.18);
-    border-radius: 6px;
-    color: var(--text);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 13px;
-    padding: 14px;
+    background: #e8ecf0;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: var(--radius-sm);
+    color: #0d1117;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 15px;
+    padding: 14px 16px;
     outline: none;
     margin-bottom: 14px;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s;
     -webkit-appearance: none;
-    height: 48px;
+    height: 52px;
   }
 
+  .nc-input::placeholder { color: #7a8794; }
   .nc-input:last-of-type { margin-bottom: 0; }
-  .nc-input:focus { border-color: rgba(0,255,255,0.45); }
+  .nc-input:focus { border-color: rgba(255,0,128,0.5); box-shadow: 0 0 0 3px rgba(255,0,128,0.1); }
 
-  /* Analyze button */
-  .analyze-btn {
+  /* CTA button */
+  .cta-btn {
     width: 100%;
-    background: linear-gradient(135deg, rgba(255,0,128,0.18), rgba(0,255,255,0.08));
-    border: 1px solid rgba(255,0,128,0.55);
-    border-radius: 8px;
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius);
     color: #fff;
-    font-family: 'Orbitron', monospace;
-    font-size: 13px;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 16px;
     font-weight: 700;
-    letter-spacing: 3px;
+    letter-spacing: 1px;
     padding: 18px;
     cursor: pointer;
-    text-transform: uppercase;
     transition: all 0.2s;
     -webkit-tap-highlight-color: transparent;
-    min-height: 56px;
+    min-height: 58px;
   }
 
-  .analyze-btn:active:not(:disabled) {
-    background: linear-gradient(135deg, rgba(255,0,128,0.35), rgba(0,255,255,0.18));
-    box-shadow: 0 0 24px rgba(255,0,128,0.35);
-    transform: scale(0.98);
+  .cta-btn:active:not(:disabled) {
+    transform: scale(0.97);
+    opacity: 0.85;
   }
 
-  .analyze-btn:disabled { opacity: 0.38; cursor: not-allowed; }
+  .cta-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
   /* Error */
   .error-msg {
     background: rgba(255,0,80,0.1);
-    border: 1px solid rgba(255,0,80,0.3);
-    border-radius: 6px;
-    padding: 14px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 11px;
+    border: 1px solid rgba(255,0,80,0.25);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    font-size: 13px;
     color: #ff5080;
     text-align: center;
     display: none;
@@ -279,77 +266,80 @@
   .error-msg.visible { display: block; }
 
   /* Loading */
-  .loading-state {
-    text-align: center;
-    padding: 32px 16px;
+  .loading {
     display: none;
+    text-align: center;
+    padding: 36px 20px;
   }
 
-  .loading-state.visible { display: block; }
+  .loading.visible { display: block; }
 
   .loading-bar {
     width: 100%;
-    height: 2px;
-    background: rgba(0,255,255,0.08);
-    border-radius: 1px;
+    height: 3px;
+    background: var(--card);
+    border-radius: 2px;
     overflow: hidden;
-    margin: 16px 0 12px;
+    margin: 0 0 14px;
   }
 
   .loading-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--magenta), var(--cyan));
-    border-radius: 1px;
-    animation: scanLoad 2.2s ease-in-out infinite;
+    background: linear-gradient(90deg, var(--accent), var(--cyan));
+    border-radius: 2px;
+    animation: load 2s ease-in-out infinite;
   }
 
-  @keyframes scanLoad {
-    0%   { width: 0%;  margin-left: 0; }
-    50%  { width: 55%; margin-left: 25%; }
-    100% { width: 0%;  margin-left: 100%; }
+  @keyframes load {
+    0%   { width:0%; margin-left:0 }
+    50%  { width:55%; margin-left:25% }
+    100% { width:0%; margin-left:100% }
   }
 
   .loading-label {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 10px;
-    color: rgba(0,255,255,0.55);
+    font-size: 12px;
+    font-weight: 500;
     letter-spacing: 2px;
+    color: var(--faint);
     text-transform: uppercase;
   }
 
   /* Divider */
   .divider {
     border: none;
-    border-top: 1px solid rgba(0,255,255,0.1);
-    margin: 24px 0;
+    border-top: 1px solid var(--border);
+    margin: 28px 0;
   }
 
+  /* Output */
+  .output { display: none; }
+  .output.visible { display: block; }
+
   /* Section label */
-  .section-label {
-    font-family: 'Orbitron', monospace;
-    font-size: 9px;
+  .sec-label {
+    font-size: 11px;
+    font-weight: 600;
     letter-spacing: 3px;
-    color: rgba(0,255,255,0.55);
+    color: var(--faint);
     text-transform: uppercase;
     margin-bottom: 16px;
   }
 
-  /* Output section */
-  .output-section { display: none; }
-  .output-section.visible { display: block; }
-
-  /* Score ring block */
+  /* Score block */
   .score-block {
     display: flex;
     align-items: center;
-    gap: 18px;
-    margin-bottom: 8px;
+    gap: 20px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 4px;
   }
 
   .ring-wrap {
     position: relative;
-    width: 96px;
-    height: 96px;
+    width: 88px; height: 88px;
     flex-shrink: 0;
   }
 
@@ -366,19 +356,19 @@
 
   .ring-pct {
     font-family: 'Orbitron', monospace;
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 900;
-    color: #fff;
+    color: var(--text);
     line-height: 1;
   }
 
   .ring-lbl {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 8px;
-    color: rgba(255,255,255,0.38);
+    font-size: 9px;
+    font-weight: 600;
     letter-spacing: 1px;
+    color: var(--faint);
     text-transform: uppercase;
-    margin-top: 2px;
+    margin-top: 3px;
   }
 
   .score-meta { flex: 1; min-width: 0; }
@@ -392,21 +382,20 @@
   }
 
   .score-desc {
-    font-family: 'Exo 2', sans-serif;
-    font-size: 12px;
+    font-size: 13px;
     color: var(--muted);
     line-height: 1.65;
   }
 
-  /* Category bars */
-  .cat-grid {
+  /* Categories */
+  .cat-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
     margin-bottom: 4px;
   }
 
-  .cat-row { display: flex; flex-direction: column; gap: 5px; }
+  .cat-row { display: flex; flex-direction: column; gap: 6px; }
 
   .cat-header {
     display: flex;
@@ -415,34 +404,33 @@
   }
 
   .cat-name {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 11px;
+    font-size: 13px;
+    font-weight: 600;
     color: var(--text);
-    letter-spacing: 0.5px;
   }
 
   .cat-count {
-    font-family: 'Orbitron', monospace;
-    font-size: 10px;
-    font-weight: 700;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
   }
 
-  .cat-bar-bg {
-    height: 5px;
-    background: rgba(255,255,255,0.05);
+  .bar-bg {
+    height: 6px;
+    background: var(--card);
     border-radius: 3px;
     overflow: hidden;
   }
 
-  .cat-bar-fill {
+  .bar-fill {
     height: 100%;
     border-radius: 3px;
     width: 0%;
-    transition: width 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: width 0.9s cubic-bezier(0.22,1,0.36,1);
   }
 
-  /* Flagged phrases */
-  .flags-list {
+  /* Flagged */
+  .flag-list {
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -450,27 +438,40 @@
   }
 
   .flag-item {
-    background: rgba(255,255,255,0.03);
-    border-left: 3px solid;
-    border-radius: 0 6px 6px 0;
-    padding: 12px 14px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 14px 16px;
   }
 
   .flag-phrase {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 12px;
+    font-size: 14px;
+    font-weight: 600;
     margin-bottom: 4px;
     line-height: 1.5;
   }
 
-  .flag-type {
-    font-family: 'Exo 2', sans-serif;
-    font-size: 11px;
+  .flag-reason {
+    font-size: 12px;
     color: var(--muted);
-    line-height: 1.5;
+    line-height: 1.55;
   }
 
-  /* Removal actions */
+  .flag-type-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    background: var(--accent-dim);
+    color: var(--accent);
+  }
+
+  /* Removals */
   .removal-list {
     display: flex;
     flex-direction: column;
@@ -479,112 +480,122 @@
 
   .removal-item {
     display: flex;
-    gap: 12px;
-    background: rgba(0,0,0,0.35);
-    border: 1px solid rgba(255,170,0,0.2);
-    border-radius: 6px;
-    padding: 14px;
+    gap: 14px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px;
     align-items: flex-start;
   }
 
-  .removal-icon {
+  .removal-num {
     font-family: 'Orbitron', monospace;
-    font-size: 10px;
+    font-size: 11px;
+    font-weight: 700;
     color: var(--amber);
-    min-width: 22px;
+    min-width: 24px;
     padding-top: 1px;
     flex-shrink: 0;
   }
 
   .removal-text {
-    font-family: 'Exo 2', sans-serif;
-    font-size: 13px;
-    color: rgba(224,232,240,0.85);
-    line-height: 1.6;
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.65;
   }
 
   /* Footer */
   .footer {
     text-align: center;
-    margin-top: 48px;
-    padding-top: 24px;
-    border-top: 1px solid rgba(0,255,255,0.08);
+    margin-top: 52px;
+    padding-top: 28px;
+    border-top: 1px solid var(--border);
   }
 
   .footer-brand {
     font-family: 'Orbitron', monospace;
-    font-size: 10px;
-    letter-spacing: 3px;
-    color: rgba(0,255,255,0.25);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: var(--faint);
   }
 
-  .footer-brand span { color: rgba(255,0,128,0.35); }
+  .footer-brand span { color: rgba(255,0,128,0.5); }
+
+  .footer-sub {
+    font-size: 11px;
+    color: rgba(230,237,243,0.2);
+    margin-top: 6px;
+    letter-spacing: 2px;
+  }
 </style>
 </head>
 <body>
 
 <nav class="nav">
-  <a class="nav-brand" href="index.html">GRAVIFICER</a>
-  <a class="nav-back" href="index.html">◂ HUB</a>
+  <a class="nav-brand" href="index.html">GRAVIFI<span>CER</span></a>
+  <a class="nav-back" href="index.html">← Hub</a>
 </nav>
 
 <main class="main">
+
   <div class="header">
-    <div class="eyebrow">▸ INSTRUMENT 02</div>
-    <h1 class="title">NOISE <span>CLASSIFIER</span></h1>
-    <div class="subtitle">DETECT · CATEGORIZE · REMOVE</div>
+    <div class="header-eye">Instrument 02</div>
+    <h1 class="header-title">NOISE <span>CLASSIFIER</span></h1>
+    <div class="header-sub">Detect · Categorize · Remove</div>
+    <p class="header-desc">Identifies and maps the noise in any written content. Returns a signal-to-noise score, flagged phrases, and surgical removal actions.</p>
   </div>
 
-  <div class="mode-toggle">
-    <button class="mode-btn active" id="btn-freeform" onclick="setMode('freeform')">FREE-FORM</button>
-    <button class="mode-btn" id="btn-structured" onclick="setMode('structured')">STRUCTURED</button>
+  <div class="mode-wrap">
+    <button class="mode-btn active" id="btn-free" onclick="setMode('free')">Free-Form</button>
+    <button class="mode-btn" id="btn-struct" onclick="setMode('struct')">Structured</button>
   </div>
 
-  <div class="input-panel" id="panel-freeform">
-    <div class="field-label">▸ PASTE INPUT</div>
-    <textarea class="nc-textarea" id="input-freeform"
-      placeholder="Paste any text — headline, paragraph, strategy, brief, pitch, concept..."></textarea>
+  <div class="input-card" id="panel-free">
+    <div class="field-label">Input</div>
+    <textarea class="nc-textarea" id="input-free"
+      placeholder="Paste anything — a headline, paragraph, pitch, brief, strategy, or concept..."></textarea>
   </div>
 
-  <div class="input-panel hidden" id="panel-structured">
-    <div class="field-label">▸ HEADLINE</div>
-    <input class="nc-input" id="input-headline" placeholder="Your headline or title..." type="text" />
-    <div class="field-label">▸ BODY</div>
+  <div class="input-card hidden" id="panel-struct">
+    <div class="field-label">Headline</div>
+    <input class="nc-input" id="input-headline" type="text" placeholder="Your headline or title..." />
+    <div class="field-label" style="margin-top:4px;">Body</div>
     <textarea class="nc-textarea" id="input-body"
-      placeholder="Body copy, description, or main content..." style="min-height:100px; margin-bottom:14px;"></textarea>
-    <div class="field-label">▸ CTA / CLOSER</div>
-    <input class="nc-input" id="input-cta" placeholder="Call to action or closing statement..." type="text" style="margin-bottom:0;" />
+      placeholder="Body copy or main content..." style="min-height:100px; margin-bottom:14px;"></textarea>
+    <div class="field-label">CTA / Closer</div>
+    <input class="nc-input" id="input-cta" type="text" placeholder="Call to action or closing statement..." style="margin-bottom:0;" />
   </div>
 
-  <button class="analyze-btn" id="analyze-btn" onclick="runAnalysis()">▸ CLASSIFY NOISE</button>
+  <button class="cta-btn" id="analyze-btn" onclick="runAnalysis()">Classify Noise →</button>
   <div class="error-msg" id="error-msg"></div>
 
-  <div class="loading-state" id="loading-state">
+  <div class="loading" id="loading">
     <div class="loading-bar"><div class="loading-fill"></div></div>
-    <div class="loading-label" id="loading-label">SCANNING FOR NOISE...</div>
+    <div class="loading-label" id="loading-label">Scanning for noise...</div>
   </div>
 
-  <div class="output-section" id="output-section">
+  <div class="output" id="output">
     <hr class="divider">
 
-    <div class="section-label">▸ SIGNAL / NOISE RATIO</div>
+    <div class="sec-label">Signal / Noise Ratio</div>
     <div class="score-block">
       <div class="ring-wrap">
-        <svg width="96" height="96" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="48" cy="48" r="40" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="7"/>
-          <circle id="ring-signal" cx="48" cy="48" r="40" fill="none"
-            stroke="#00ffff" stroke-width="7" stroke-linecap="round"
-            stroke-dasharray="251.33" stroke-dashoffset="251.33"
-            style="transition: stroke-dashoffset 1s cubic-bezier(0.22,1,0.36,1); filter: drop-shadow(0 0 6px rgba(0,255,255,0.5))"/>
-          <circle cx="48" cy="48" r="28" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="5"/>
-          <circle id="ring-noise" cx="48" cy="48" r="28" fill="none"
+        <svg width="88" height="88" viewBox="0 0 88 88">
+          <circle cx="44" cy="44" r="37" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="7"/>
+          <circle id="ring-s" cx="44" cy="44" r="37" fill="none"
+            stroke="#00d4ff" stroke-width="7" stroke-linecap="round"
+            stroke-dasharray="232.48" stroke-dashoffset="232.48"
+            style="transition:stroke-dashoffset 1s cubic-bezier(0.22,1,0.36,1)"/>
+          <circle cx="44" cy="44" r="26" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="5"/>
+          <circle id="ring-n" cx="44" cy="44" r="26" fill="none"
             stroke="#ff0080" stroke-width="5" stroke-linecap="round"
-            stroke-dasharray="175.93" stroke-dashoffset="175.93"
-            style="transition: stroke-dashoffset 1s cubic-bezier(0.22,1,0.36,1) 0.15s; filter: drop-shadow(0 0 6px rgba(255,0,128,0.5))"/>
+            stroke-dasharray="163.36" stroke-dashoffset="163.36"
+            style="transition:stroke-dashoffset 1s cubic-bezier(0.22,1,0.36,1) 0.15s"/>
         </svg>
         <div class="ring-center">
           <div class="ring-pct" id="ring-pct">—</div>
-          <div class="ring-lbl">SIGNAL</div>
+          <div class="ring-lbl">Signal</div>
         </div>
       </div>
       <div class="score-meta">
@@ -594,91 +605,86 @@
     </div>
 
     <hr class="divider">
-    <div class="section-label">▸ NOISE CATEGORIES</div>
-    <div class="cat-grid" id="cat-grid"></div>
+    <div class="sec-label">Noise Categories</div>
+    <div class="cat-list" id="cat-list"></div>
 
     <hr class="divider">
-    <div class="section-label">▸ FLAGGED PHRASES</div>
-    <div class="flags-list" id="flags-list"></div>
+    <div class="sec-label">Flagged Phrases</div>
+    <div class="flag-list" id="flag-list"></div>
 
     <hr class="divider">
-    <div class="section-label">▸ REMOVAL ACTIONS</div>
+    <div class="sec-label">Removal Actions</div>
     <div class="removal-list" id="removal-list"></div>
   </div>
 
   <div class="footer">
-    <div class="footer-brand">GRAVIFI<span>CER</span> · INSTRUMENT 02</div>
+    <div class="footer-brand">GRAVIFI<span>CER</span></div>
+    <div class="footer-sub">Instrument 02 · MVANNP</div>
   </div>
+
 </main>
 
 <script>
 const CAT_COLORS = {
-  'Filler':          '#00ffff',
-  'Filler/Padding':  '#00ffff',
-  'Vague Language':  '#ff0080',
-  'Vague/Abstract':  '#ff0080',
-  'Redundancy':      '#ffaa00',
-  'Generic Framing': '#aa55ff',
-  'Overload':        '#ff5500',
+  'Filler':'#00d4ff','Filler/Padding':'#00d4ff',
+  'Vague Language':'#ff0080','Vague/Abstract':'#ff0080',
+  'Redundancy':'#ffaa00',
+  'Generic Framing':'#aa55ff',
+  'Overload':'#ff5500'
 };
 
-function catColor(name) {
-  if (CAT_COLORS[name]) return CAT_COLORS[name];
-  const vals = Object.values(CAT_COLORS);
-  return vals[Math.abs(hashStr(name)) % vals.length];
+function catColor(n) {
+  if (CAT_COLORS[n]) return CAT_COLORS[n];
+  const v = Object.values(CAT_COLORS);
+  return v[Math.abs(hash(n)) % v.length];
 }
 
-function hashStr(s) {
-  let h = 0;
-  for (let i = 0; i < s.length; i++) h = (Math.imul(31,h) + s.charCodeAt(i)) | 0;
+function hash(s) {
+  let h=0;
+  for(let i=0;i<s.length;i++) h=(Math.imul(31,h)+s.charCodeAt(i))|0;
   return h;
 }
 
-let currentMode = 'freeform';
+let mode = 'free';
 
-function setMode(mode) {
-  currentMode = mode;
-  document.getElementById('btn-freeform').classList.toggle('active', mode === 'freeform');
-  document.getElementById('btn-structured').classList.toggle('active', mode === 'structured');
-  document.getElementById('panel-freeform').classList.toggle('hidden', mode !== 'freeform');
-  document.getElementById('panel-structured').classList.toggle('hidden', mode !== 'structured');
+function setMode(m) {
+  mode = m;
+  document.getElementById('btn-free').classList.toggle('active', m==='free');
+  document.getElementById('btn-struct').classList.toggle('active', m==='struct');
+  document.getElementById('panel-free').classList.toggle('hidden', m!=='free');
+  document.getElementById('panel-struct').classList.toggle('hidden', m!=='struct');
 }
 
-function getInputText() {
-  if (currentMode === 'freeform') {
-    return document.getElementById('input-freeform').value.trim();
-  }
-  const parts = [];
-  const h = document.getElementById('input-headline').value.trim();
-  const b = document.getElementById('input-body').value.trim();
-  const c = document.getElementById('input-cta').value.trim();
-  if (h) parts.push('HEADLINE: ' + h);
-  if (b) parts.push('BODY: ' + b);
-  if (c) parts.push('CTA: ' + c);
+function getText() {
+  if (mode==='free') return document.getElementById('input-free').value.trim();
+  const parts=[];
+  const h=document.getElementById('input-headline').value.trim();
+  const b=document.getElementById('input-body').value.trim();
+  const c=document.getElementById('input-cta').value.trim();
+  if(h) parts.push('HEADLINE: '+h);
+  if(b) parts.push('BODY: '+b);
+  if(c) parts.push('CTA: '+c);
   return parts.join('\n\n');
 }
 
-function setLoading(on, msg) {
-  document.getElementById('loading-state').classList.toggle('visible', on);
+function setLoad(on, msg) {
+  document.getElementById('loading').classList.toggle('visible', on);
   document.getElementById('analyze-btn').disabled = on;
-  if (msg) document.getElementById('loading-label').textContent = msg;
+  if(msg) document.getElementById('loading-label').textContent = msg;
 }
 
-function showError(msg) {
-  const el = document.getElementById('error-msg');
-  el.textContent = msg;
-  el.classList.add('visible');
+function showErr(msg) {
+  const e=document.getElementById('error-msg');
+  e.textContent=msg; e.classList.add('visible');
 }
 
-function hideError() {
-  document.getElementById('error-msg').classList.remove('visible');
-}
+function hideErr() { document.getElementById('error-msg').classList.remove('visible'); }
 
-const SYSTEM = `You are the Gravificer Noise Classifier — a precision instrument for detecting noise in written communication.
+const SYS = `You are the Gravificer Noise Classifier — a precision instrument for detecting noise in written communication.
 
 Gravificer philosophy: Every output must clarify, reveal, or reframe — otherwise it is noise.
 
-Analyze the input and return ONLY a valid JSON object — no markdown, no backticks, no preamble:
+Return ONLY a valid JSON object — no markdown, no backticks, no preamble:
 
 {
   "signal_score": <integer 0-100>,
@@ -691,135 +697,125 @@ Analyze the input and return ONLY a valid JSON object — no markdown, no backti
     { "phrase": "<exact or near-exact phrase>", "type": "<category>", "reason": "<short reason>" }
   ],
   "removals": [
-    "<specific actionable removal or rewrite instruction>"
+    "<specific actionable instruction>"
   ]
 }
 
 Noise categories (only include what is present):
 - Filler: zero-meaning words (e.g. "very," "really," "it is important to note")
-- Vague Language: non-specific abstractions (e.g. "leverage," "synergy," "world-class," "innovative")
+- Vague Language: non-specific abstractions (e.g. "leverage," "synergy," "world-class")
 - Redundancy: same idea repeated in different words
-- Generic Framing: could-apply-to-anything openers/closers (e.g. "In today's fast-paced world")
-- Overload: too many ideas in one sentence, fragmenting signal
+- Generic Framing: could-apply-to-anything openers/closers
+- Overload: too many ideas in one sentence
 
 Return 3–6 flagged phrases. Return 3–5 specific removal actions. Be surgical and direct.`;
 
 async function runAnalysis() {
-  hideError();
-  const text = getInputText();
-  if (!text) { showError('No input detected. Paste content to classify.'); return; }
+  hideErr();
+  const text = getText();
+  if(!text) { showErr('No input detected. Paste content to classify.'); return; }
 
-  document.getElementById('output-section').classList.remove('visible');
-  setLoading(true, 'SCANNING FOR NOISE...');
+  document.getElementById('output').classList.remove('visible');
+  setLoad(true, 'Scanning for noise...');
 
-  const msgs = ['MAPPING SIGNAL PATTERNS...','ISOLATING NOISE CATEGORIES...','GENERATING REMOVAL ACTIONS...'];
-  let mi = 0;
-  const timer = setInterval(() => {
-    mi = (mi + 1) % msgs.length;
-    document.getElementById('loading-label').textContent = msgs[mi];
-  }, 1900);
+  const msgs=['Mapping signal patterns...','Isolating noise categories...','Generating removal actions...'];
+  let mi=0;
+  const t=setInterval(()=>{ mi=(mi+1)%msgs.length; document.getElementById('loading-label').textContent=msgs[mi]; },1900);
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        system: SYSTEM,
-        messages: [{ role: 'user', content: 'Analyze:\n\n' + text }]
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system:SYS,
+        messages:[{role:'user',content:'Analyze:\n\n'+text}]
       })
     });
 
-    clearInterval(timer);
-    setLoading(false);
-    if (!res.ok) throw new Error('API ' + res.status);
+    clearInterval(t); setLoad(false);
+    if(!res.ok) throw new Error('API '+res.status);
 
-    const data = await res.json();
-    const raw = data.content.map(b => b.text || '').join('');
-    const clean = raw.replace(/```json|```/g,'').trim();
-    render(JSON.parse(clean));
+    const data=await res.json();
+    const raw=data.content.map(b=>b.text||'').join('');
+    render(JSON.parse(raw.replace(/```json|```/g,'').trim()));
   } catch(e) {
-    clearInterval(timer);
-    setLoading(false);
-    showError('Classification failed. Check your connection and try again.');
+    clearInterval(t); setLoad(false);
+    showErr('Classification failed. Check your connection and try again.');
     console.error(e);
   }
 }
 
 function render(d) {
-  const sig = Math.min(100, Math.max(0, d.signal_score || 0));
-  const noise = 100 - sig;
+  const sig = Math.min(100,Math.max(0,d.signal_score||0));
+  const noi = 100-sig;
+  const co=232.48, ci=163.36;
 
-  // Rings
-  const co = 251.33, ci = 175.93;
-  document.getElementById('ring-pct').textContent = sig + '%';
-  setTimeout(() => {
-    document.getElementById('ring-signal').style.strokeDashoffset = co * (1 - sig / 100);
-    document.getElementById('ring-noise').style.strokeDashoffset = ci * (1 - noise / 100);
-  }, 80);
+  document.getElementById('ring-pct').textContent = sig+'%';
+  setTimeout(()=>{
+    document.getElementById('ring-s').style.strokeDashoffset = co*(1-sig/100);
+    document.getElementById('ring-n').style.strokeDashoffset = ci*(1-noi/100);
+  },80);
 
-  // Verdict
-  const vColor = sig >= 70 ? '#00ffff' : sig >= 45 ? '#ffaa00' : '#ff0080';
-  const vEl = document.getElementById('score-verdict');
-  vEl.textContent = d.verdict || '—';
-  vEl.style.color = vColor;
-  document.getElementById('score-desc').textContent = d.description || '';
+  const vColor = sig>=70?'#00d4ff':sig>=45?'#ffaa00':'#ff0080';
+  const v=document.getElementById('score-verdict');
+  v.textContent=d.verdict||'—'; v.style.color=vColor;
+  document.getElementById('score-desc').textContent=d.description||'';
 
   // Categories
-  const cats = d.categories || [];
-  const maxC = cats.reduce((m, c) => Math.max(m, c.count), 1);
-  const grid = document.getElementById('cat-grid');
-  grid.innerHTML = '';
-  cats.forEach(cat => {
-    const col = catColor(cat.name);
-    const pct = Math.round((cat.count / maxC) * 100);
-    const row = document.createElement('div');
-    row.className = 'cat-row';
-    row.innerHTML = `
+  const cats=d.categories||[];
+  const maxC=cats.reduce((m,c)=>Math.max(m,c.count),1);
+  const cl=document.getElementById('cat-list');
+  cl.innerHTML='';
+  cats.forEach(cat=>{
+    const col=catColor(cat.name);
+    const pct=Math.round((cat.count/maxC)*100);
+    const row=document.createElement('div');
+    row.className='cat-row';
+    row.innerHTML=`
       <div class="cat-header">
-        <span class="cat-name">${cat.name.toUpperCase()}</span>
-        <span class="cat-count" style="color:${col}">${cat.count} instance${cat.count !== 1 ? 's' : ''}</span>
+        <span class="cat-name">${cat.name}</span>
+        <span class="cat-count">${cat.count} instance${cat.count!==1?'s':''}</span>
       </div>
-      <div class="cat-bar-bg">
-        <div class="cat-bar-fill" style="background:${col};" data-pct="${pct}"></div>
+      <div class="bar-bg">
+        <div class="bar-fill" style="background:${col};" data-pct="${pct}"></div>
       </div>`;
-    grid.appendChild(row);
+    cl.appendChild(row);
   });
-  setTimeout(() => {
-    grid.querySelectorAll('.cat-bar-fill').forEach(el => {
-      el.style.width = el.dataset.pct + '%';
-    });
-  }, 120);
+  setTimeout(()=>{
+    cl.querySelectorAll('.bar-fill').forEach(el=>{ el.style.width=el.dataset.pct+'%'; });
+  },120);
 
   // Flagged
-  const flagsList = document.getElementById('flags-list');
-  flagsList.innerHTML = '';
-  (d.flagged || []).forEach(f => {
-    const col = catColor(f.type);
-    const item = document.createElement('div');
-    item.className = 'flag-item';
-    item.style.borderLeftColor = col;
-    item.innerHTML = `
-      <div class="flag-phrase" style="color:${col}">"${f.phrase}"</div>
-      <div class="flag-type">${f.type} — ${f.reason}</div>`;
-    flagsList.appendChild(item);
+  const fl=document.getElementById('flag-list');
+  fl.innerHTML='';
+  (d.flagged||[]).forEach(f=>{
+    const col=catColor(f.type);
+    const item=document.createElement('div');
+    item.className='flag-item';
+    item.style.borderLeftColor=col;
+    item.innerHTML=`
+      <div class="flag-type-tag" style="background:${col}22;color:${col};">${f.type}</div>
+      <div class="flag-phrase">"${f.phrase}"</div>
+      <div class="flag-reason">${f.reason}</div>`;
+    fl.appendChild(item);
   });
 
   // Removals
-  const removalList = document.getElementById('removal-list');
-  removalList.innerHTML = '';
-  (d.removals || []).forEach((r, i) => {
-    const item = document.createElement('div');
-    item.className = 'removal-item';
-    item.innerHTML = `
-      <div class="removal-icon">R${i + 1}</div>
-      <div class="removal-text">${r}</div>`;
-    removalList.appendChild(item);
+  const rl=document.getElementById('removal-list');
+  rl.innerHTML='';
+  (d.removals||[]).forEach((r,i)=>{
+    const item=document.createElement('div');
+    item.className='removal-item';
+    item.innerHTML=`<div class="removal-num">R${i+1}</div><div class="removal-text">${r}</div>`;
+    rl.appendChild(item);
   });
 
-  document.getElementById('output-section').classList.add('visible');
-  document.getElementById('output-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.getElementById('output').classList.add('visible');
+  setTimeout(()=>{
+    document.getElementById('output').scrollIntoView({behavior:'smooth',block:'start'});
+  },100);
 }
 </script>
 </body>
