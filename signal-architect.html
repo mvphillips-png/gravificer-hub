@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Signal Architect — Gravificer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Exo+2:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d1117;
+    --card: #161b22;
+    --card2: #1c2230;
+    --border: rgba(255,255,255,0.08);
+    --text: #e6edf3;
+    --muted: rgba(230,237,243,0.55);
+    --faint: rgba(230,237,243,0.3);
+    --accent: #ffaa00;
+    --accent-dim: rgba(255,170,0,0.12);
+    --magenta: #ff0080;
+    --cyan: #00d4ff;
+    --green: #00ff88;
+    --purple: #aa55ff;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Exo 2', sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Nav */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(13,17,23,0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-brand {
+    font-family: 'Orbitron', monospace;
+    font-size: 15px;
+    font-weight: 900;
+    color: var(--text);
+    letter-spacing: 3px;
+    text-decoration: none;
+  }
+
+  .nav-brand span { color: var(--magenta); }
+
+  .nav-back {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .nav-back:active { background: var(--card); color: var(--text); }
+
+  /* Main */
+  .main {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 36px 20px 80px;
+  }
+
+  /* Header */
+  .header { text-align: center; margin-bottom: 32px; }
+
+  .header-eye {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    color: var(--faint);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .header-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(20px, 6.5vw, 30px);
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: var(--text);
+    margin-bottom: 4px;
+    line-height: 1.1;
+  }
+
+  .header-title span { color: var(--accent); }
+
+  .header-sub {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 3px;
+    color: var(--faint);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .header-desc {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.75;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  /* Material legend */
+  .legend {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .legend-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+
+  .legend-body {}
+
+  .legend-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 2px;
+    letter-spacing: 0.5px;
+  }
+
+  .legend-desc {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* Input card */
+  .input-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 12px;
+  }
+
+  .field-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    opacity: 0.85;
+  }
+
+  .nc-textarea {
+    width: 100%;
+    background: #e8ecf0;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: var(--radius-sm);
+    color: #0d1117;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    padding: 14px 16px;
+    resize: none;
+    min-height: 140px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+  }
+
+  .nc-textarea::placeholder { color: #7a8794; }
+  .nc-textarea:focus {
+    border-color: rgba(255,170,0,0.5);
+    box-shadow: 0 0 0 3px rgba(255,170,0,0.1);
+  }
+
+  .char-count {
+    font-size: 11px;
+    color: var(--faint);
+    text-align: right;
+    margin-top: 8px;
+  }
+
+  /* CTA */
+  .cta-btn {
+    width: 100%;
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius);
+    color: #0d1117;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 58px;
+  }
+
+  .cta-btn:active:not(:disabled) { transform: scale(0.97); opacity: 0.85; }
+  .cta-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  /* Error */
+  .error-msg {
+    background: rgba(255,0,80,0.1);
+    border: 1px solid rgba(255,0,80,0.25);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    font-size: 13px;
+    color: #ff5080;
+    text-align: center;
+    display: none;
+    margin-top: 12px;
+    line-height: 1.6;
+  }
+
+  .error-msg.visible { display: block; }
+
+  /* Loading */
+  .loading { display: none; text-align: center; padding: 36px 20px; }
+  .loading.visible { display: block; }
+
+  .loading-bar {
+    width: 100%;
+    height: 3px;
+    background: var(--card);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 0 0 14px;
+  }
+
+  .loading-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--cyan));
+    border-radius: 2px;
+    animation: load 2s ease-in-out infinite;
+  }
+
+  @keyframes load {
+    0%{width:0%;margin-left:0}
+    50%{width:55%;margin-left:25%}
+    100%{width:0%;margin-left:100%}
+  }
+
+  .loading-label {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    color: var(--faint);
+    text-transform: uppercase;
+  }
+
+  /* Divider */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+
+  /* Output */
+  .output { display: none; }
+  .output.visible { display: block; }
+
+  .sec-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    color: var(--faint);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  /* Balance bars */
+  .balance-grid {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .bal-row { display: flex; flex-direction: column; gap: 6px; }
+
+  .bal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .bal-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .bal-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .bal-status {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  .status-strong   { background: rgba(0,255,136,0.12); color: #00ff88; }
+  .status-weak     { background: rgba(255,170,0,0.12);  color: #ffaa00; }
+  .status-missing  { background: rgba(255,0,128,0.12);  color: #ff0080; }
+  .status-overloaded { background: rgba(255,85,0,0.12); color: #ff5500; }
+  .status-balanced { background: rgba(0,212,255,0.12);  color: #00d4ff; }
+
+  .bal-bar-bg {
+    height: 6px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .bal-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    width: 0%;
+    transition: width 0.9s cubic-bezier(0.22,1,0.36,1);
+  }
+
+  /* Material panels */
+  .material-panels {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+
+  .mat-panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .mat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mat-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .mat-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .mat-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--text);
+  }
+
+  .mat-body {
+    padding: 16px 18px;
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.75;
+  }
+
+  /* Architect's note */
+  .architect-note {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 22px 20px;
+    margin-bottom: 4px;
+  }
+
+  .note-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    opacity: 0.8;
+  }
+
+  .note-text {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    margin-top: 52px;
+    padding-top: 28px;
+    border-top: 1px solid var(--border);
+  }
+
+  .footer-brand {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: var(--faint);
+  }
+
+  .footer-brand span { color: rgba(255,0,128,0.5); }
+  .footer-sub { font-size: 11px; color: rgba(230,237,243,0.2); margin-top: 6px; letter-spacing: 2px; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-brand" href="index.html">GRAVIFI<span>CER</span></a>
+  <a class="nav-back" href="index.html">← Hub</a>
+</nav>
+
+<main class="main">
+
+  <div class="header">
+    <div class="header-eye">Instrument 03</div>
+    <h1 class="header-title">SIGNAL <span>ARCHITECT</span></h1>
+    <div class="header-sub">Audit · Balance · Strengthen</div>
+    <p class="header-desc">Every signal is built from four materials. This instrument breaks your message down across all four — revealing what's missing, overloaded, or working against the signal.</p>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#00d4ff;"></div>
+      <div class="legend-body">
+        <div class="legend-name">Art</div>
+        <div class="legend-desc">Form, aesthetic, and how the signal is shaped</div>
+      </div>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#ff0080;"></div>
+      <div class="legend-body">
+        <div class="legend-name">Energy</div>
+        <div class="legend-desc">Momentum, tension, and emotional charge</div>
+      </div>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#ffaa00;"></div>
+      <div class="legend-body">
+        <div class="legend-name">Knowledge</div>
+        <div class="legend-desc">Substance, clarity, and what is actually known</div>
+      </div>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#aa55ff;"></div>
+      <div class="legend-body">
+        <div class="legend-name">Patterns</div>
+        <div class="legend-desc">Structure, rhythm, and recurring signal logic</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-card">
+    <div class="field-label">Signal Input</div>
+    <textarea class="nc-textarea" id="signal-input" maxlength="600"
+      placeholder="Paste any message, idea, pitch, creative brief, strategy, or piece of writing to audit..."
+      oninput="updateCount()"></textarea>
+    <div class="char-count"><span id="char-count">0</span> / 600</div>
+  </div>
+
+  <button class="cta-btn" id="architect-btn" onclick="runAudit()">Audit Signal →</button>
+  <div class="error-msg" id="error-msg"></div>
+
+  <div class="loading" id="loading">
+    <div class="loading-bar"><div class="loading-fill"></div></div>
+    <div class="loading-label" id="loading-label">Auditing materials...</div>
+  </div>
+
+  <div class="output" id="output">
+    <hr class="divider">
+
+    <div class="sec-label">Material Balance</div>
+    <div class="balance-grid" id="balance-grid"></div>
+
+    <hr class="divider">
+    <div class="sec-label">Material Breakdown</div>
+    <div class="material-panels" id="material-panels"></div>
+
+    <hr class="divider">
+    <div class="sec-label">Architect's Directive</div>
+    <div class="architect-note">
+      <div class="note-label">Priority Adjustment</div>
+      <div class="note-text" id="directive-text"></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-brand">GRAVIFI<span>CER</span></div>
+    <div class="footer-sub">Instrument 03 · MVANNP</div>
+  </div>
+
+</main>
+
+<script>
+const MATERIALS = [
+  { key: 'art',      label: 'Art',      color: '#00d4ff', icon: '◈', bg: 'rgba(0,212,255,0.12)' },
+  { key: 'energy',   label: 'Energy',   color: '#ff0080', icon: '◉', bg: 'rgba(255,0,128,0.12)' },
+  { key: 'knowledge',label: 'Knowledge',color: '#ffaa00', icon: '◧', bg: 'rgba(255,170,0,0.12)'  },
+  { key: 'patterns', label: 'Patterns', color: '#aa55ff', icon: '◆', bg: 'rgba(170,85,255,0.12)' },
+];
+
+const STATUS_CLASS = {
+  'Strong':     'status-strong',
+  'Balanced':   'status-balanced',
+  'Weak':       'status-weak',
+  'Missing':    'status-missing',
+  'Overloaded': 'status-overloaded',
+};
+
+function updateCount() {
+  document.getElementById('char-count').textContent =
+    document.getElementById('signal-input').value.length;
+}
+
+function setLoad(on, msg) {
+  document.getElementById('loading').classList.toggle('visible', on);
+  document.getElementById('architect-btn').disabled = on;
+  if (msg) document.getElementById('loading-label').textContent = msg;
+}
+
+function showErr(msg) {
+  const e = document.getElementById('error-msg');
+  e.textContent = msg; e.classList.add('visible');
+}
+
+function hideErr() { document.getElementById('error-msg').classList.remove('visible'); }
+
+const SYS = `You are the Gravificer Signal Architect — a precision instrument for auditing the material composition of any signal.
+
+The four Gravificer materials:
+- Art: Form, aesthetic quality, how the signal is shaped and presented — the craft layer
+- Energy: Emotional charge, momentum, tension — does it move the reader?
+- Knowledge: Substance, specificity, clarity — what is actually being communicated?
+- Patterns: Structure, rhythm, internal logic — does it hold together as a system?
+
+Patterns holds a dual role: it is both raw input AND the sharpening vector that runs through the other three materials.
+
+Analyze the input across all four materials. Return ONLY a valid JSON object — no markdown, no backticks, no preamble:
+
+{
+  "materials": {
+    "art":       { "status": "<Strong|Balanced|Weak|Missing|Overloaded>", "score": <0-100>, "read": "<2-3 sentences>" },
+    "energy":    { "status": "<Strong|Balanced|Weak|Missing|Overloaded>", "score": <0-100>, "read": "<2-3 sentences>" },
+    "knowledge": { "status": "<Strong|Balanced|Weak|Missing|Overloaded>", "score": <0-100>, "read": "<2-3 sentences>" },
+    "patterns":  { "status": "<Strong|Balanced|Weak|Missing|Overloaded>", "score": <0-100>, "read": "<2-3 sentences>" }
+  },
+  "directive": "<One precise, actionable sentence — the single most important adjustment to make to strengthen this signal>"
+}
+
+Score 0-100 represents how present and effective that material is. Be specific and surgical in every read. The directive must be concrete — not generic advice.`;
+
+async function runAudit() {
+  hideErr();
+  const text = document.getElementById('signal-input').value.trim();
+  if (!text) { showErr('No input detected. Paste a message or idea to audit.'); return; }
+
+  document.getElementById('output').classList.remove('visible');
+  setLoad(true, 'Auditing materials...');
+
+  const msgs = ['Reading the Art layer...','Measuring the Energy...','Assessing the Knowledge...','Mapping the Patterns...'];
+  let mi = 0;
+  const t = setInterval(() => {
+    mi = (mi + 1) % msgs.length;
+    document.getElementById('loading-label').textContent = msgs[mi];
+  }, 1800);
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: SYS,
+        messages: [{ role: 'user', content: 'Audit this signal:\n\n' + text }]
+      })
+    });
+
+    clearInterval(t); setLoad(false);
+    if (!res.ok) throw new Error('API ' + res.status);
+
+    const data = await res.json();
+    const raw = data.content.map(b => b.text || '').join('');
+    render(JSON.parse(raw.replace(/```json|```/g, '').trim()));
+  } catch(e) {
+    clearInterval(t); setLoad(false);
+    showErr('Audit failed. Check your connection and try again.');
+    console.error(e);
+  }
+}
+
+function render(d) {
+  const mats = d.materials || {};
+
+  // Balance grid
+  const bg = document.getElementById('balance-grid');
+  bg.innerHTML = '';
+  MATERIALS.forEach(m => {
+    const mat = mats[m.key] || {};
+    const score = Math.min(100, Math.max(0, mat.score || 0));
+    const status = mat.status || 'Weak';
+    const statusClass = STATUS_CLASS[status] || 'status-weak';
+
+    const row = document.createElement('div');
+    row.className = 'bal-row';
+    row.innerHTML = `
+      <div class="bal-header">
+        <div class="bal-name">
+          <div class="bal-dot" style="background:${m.color};"></div>
+          ${m.label}
+        </div>
+        <div class="bal-status ${statusClass}">${status}</div>
+      </div>
+      <div class="bal-bar-bg">
+        <div class="bal-bar-fill" style="background:${m.color};" data-pct="${score}"></div>
+      </div>`;
+    bg.appendChild(row);
+  });
+
+  setTimeout(() => {
+    bg.querySelectorAll('.bal-bar-fill').forEach(el => {
+      el.style.width = el.dataset.pct + '%';
+    });
+  }, 100);
+
+  // Material panels
+  const mp = document.getElementById('material-panels');
+  mp.innerHTML = '';
+  MATERIALS.forEach(m => {
+    const mat = mats[m.key] || {};
+    const status = mat.status || 'Weak';
+    const statusClass = STATUS_CLASS[status] || 'status-weak';
+
+    const panel = document.createElement('div');
+    panel.className = 'mat-panel';
+    panel.style.borderTop = `3px solid ${m.color}`;
+    panel.innerHTML = `
+      <div class="mat-header">
+        <div class="mat-title">
+          <div class="mat-icon" style="background:${m.bg}; color:${m.color};">${m.icon}</div>
+          <div class="mat-name">${m.label.toUpperCase()}</div>
+        </div>
+        <div class="bal-status ${statusClass}">${status}</div>
+      </div>
+      <div class="mat-body">${mat.read || ''}</div>`;
+    mp.appendChild(panel);
+  });
+
+  // Directive
+  document.getElementById('directive-text').textContent = d.directive || '';
+
+  document.getElementById('output').classList.add('visible');
+  setTimeout(() => {
+    document.getElementById('output').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+</script>
+</body>
+</html>
