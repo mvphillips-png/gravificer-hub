@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Pattern Extractor — Gravificer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Exo+2:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d1117;
+    --card: #161b22;
+    --card2: #1c2230;
+    --border: rgba(255,255,255,0.08);
+    --text: #e6edf3;
+    --muted: rgba(230,237,243,0.55);
+    --faint: rgba(230,237,243,0.3);
+    --accent: #00ff88;
+    --accent-dim: rgba(0,255,136,0.1);
+    --magenta: #ff0080;
+    --cyan: #00d4ff;
+    --amber: #ffaa00;
+    --purple: #aa55ff;
+    --orange: #ff5500;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Exo 2', sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(13,17,23,0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-brand {
+    font-family: 'Orbitron', monospace;
+    font-size: 15px;
+    font-weight: 900;
+    color: var(--text);
+    letter-spacing: 3px;
+    text-decoration: none;
+  }
+
+  .nav-brand span { color: var(--magenta); }
+
+  .nav-back {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .nav-back:active { background: var(--card); color: var(--text); }
+
+  .main {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 36px 20px 80px;
+  }
+
+  .header { text-align: center; margin-bottom: 32px; }
+
+  .header-eye {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    color: var(--faint);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .header-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(20px, 6.5vw, 30px);
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: var(--text);
+    margin-bottom: 4px;
+    line-height: 1.1;
+  }
+
+  .header-title span { color: var(--accent); }
+
+  .header-sub {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 3px;
+    color: var(--faint);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .header-desc {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.75;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  /* What it finds */
+  .finds-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .find-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--accent);
+    border-radius: var(--radius-sm);
+    padding: 13px 14px;
+  }
+
+  .find-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  .find-desc {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+
+  /* Mode toggle */
+  .mode-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 4px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    margin-bottom: 16px;
+  }
+
+  .mode-btn {
+    background: transparent;
+    border: none;
+    border-radius: 10px;
+    color: var(--muted);
+    font-family: 'Exo 2', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mode-btn.active {
+    background: var(--card2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  /* Input */
+  .input-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 12px;
+  }
+
+  .input-card.hidden { display: none; }
+
+  .field-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    opacity: 0.85;
+  }
+
+  .nc-textarea {
+    width: 100%;
+    background: #e8ecf0;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: var(--radius-sm);
+    color: #0d1117;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    padding: 14px 16px;
+    resize: none;
+    min-height: 140px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+  }
+
+  .nc-textarea::placeholder { color: #7a8794; }
+  .nc-textarea:focus {
+    border-color: rgba(0,255,136,0.5);
+    box-shadow: 0 0 0 3px rgba(0,255,136,0.1);
+  }
+
+  .nc-input {
+    width: 100%;
+    background: #e8ecf0;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: var(--radius-sm);
+    color: #0d1117;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 15px;
+    padding: 14px 16px;
+    outline: none;
+    margin-bottom: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+    height: 52px;
+  }
+
+  .nc-input::placeholder { color: #7a8794; }
+  .nc-input:last-of-type { margin-bottom: 0; }
+  .nc-input:focus {
+    border-color: rgba(0,255,136,0.5);
+    box-shadow: 0 0 0 3px rgba(0,255,136,0.1);
+  }
+
+  .char-count {
+    font-size: 11px;
+    color: var(--faint);
+    text-align: right;
+    margin-top: 8px;
+  }
+
+  .cta-btn {
+    width: 100%;
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius);
+    color: #0d1117;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 58px;
+  }
+
+  .cta-btn:active:not(:disabled) { transform: scale(0.97); opacity: 0.85; }
+  .cta-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  .error-msg {
+    background: rgba(255,0,80,0.1);
+    border: 1px solid rgba(255,0,80,0.25);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    font-size: 13px;
+    color: #ff5080;
+    text-align: center;
+    display: none;
+    margin-top: 12px;
+    line-height: 1.6;
+  }
+
+  .error-msg.visible { display: block; }
+
+  .loading { display: none; text-align: center; padding: 36px 20px; }
+  .loading.visible { display: block; }
+
+  .loading-bar {
+    width: 100%;
+    height: 3px;
+    background: var(--card);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 0 0 14px;
+  }
+
+  .loading-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--cyan));
+    border-radius: 2px;
+    animation: load 2s ease-in-out infinite;
+  }
+
+  @keyframes load {
+    0%{width:0%;margin-left:0}
+    50%{width:55%;margin-left:25%}
+    100%{width:0%;margin-left:100%}
+  }
+
+  .loading-label {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    color: var(--faint);
+    text-transform: uppercase;
+  }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+
+  .output { display: none; }
+  .output.visible { display: block; }
+
+  .sec-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    color: var(--faint);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  /* Pattern cards */
+  .pattern-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+
+  .pattern-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .pattern-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .pattern-type-badge {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .pattern-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.5px;
+    flex: 1;
+  }
+
+  .pattern-strength {
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--faint);
+  }
+
+  .pattern-body {
+    padding: 14px 18px;
+  }
+
+  .pattern-read {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 10px;
+  }
+
+  .pattern-implication {
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 500;
+    line-height: 1.6;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+
+  .pattern-implication::before {
+    content: '→ ';
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* Tension map */
+  .tension-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+
+  .tension-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--magenta);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 14px 16px;
+  }
+
+  .tension-poles {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+
+  .tension-pole {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text);
+    background: var(--card2);
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
+
+  .tension-vs {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--magenta);
+    letter-spacing: 1px;
+  }
+
+  .tension-read {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* Master signal */
+  .master-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 22px 20px;
+  }
+
+  .master-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    opacity: 0.85;
+  }
+
+  .master-text {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.7;
+    margin-bottom: 14px;
+  }
+
+  .master-action {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.65;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+
+  .master-action strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .footer {
+    text-align: center;
+    margin-top: 52px;
+    padding-top: 28px;
+    border-top: 1px solid var(--border);
+  }
+
+  .footer-brand {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: var(--faint);
+  }
+
+  .footer-brand span { color: rgba(255,0,128,0.5); }
+  .footer-copy { font-size: 11px; color: rgba(230,237,243,0.25); margin-top: 6px; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-brand" href="index.html">GRAVIFI<span>CER</span></a>
+  <a class="nav-back" href="index.html">← Hub</a>
+</nav>
+
+<main class="main">
+
+  <div class="header">
+    <div class="header-eye">Instrument 06</div>
+    <h1 class="header-title">PATTERN <span>EXTRACTOR</span></h1>
+    <div class="header-sub">Surface · Structure · Sharpen</div>
+    <p class="header-desc">Paste any text or describe any system. The Pattern Extractor surfaces what's recurring, what's structurally hidden, and where the real tension lives — the Patterns pillar made operational.</p>
+  </div>
+
+  <div class="finds-grid">
+    <div class="find-item">
+      <div class="find-name">Recurring Patterns</div>
+      <div class="find-desc">What keeps appearing — in logic, language, or structure</div>
+    </div>
+    <div class="find-item">
+      <div class="find-name">Hidden Structure</div>
+      <div class="find-desc">The underlying architecture the surface doesn't show</div>
+    </div>
+    <div class="find-item">
+      <div class="find-name">Tension Points</div>
+      <div class="find-desc">Where opposing forces are pulling against each other</div>
+    </div>
+    <div class="find-item">
+      <div class="find-name">Master Signal</div>
+      <div class="find-desc">The one pattern that runs through everything else</div>
+    </div>
+  </div>
+
+  <div class="mode-wrap">
+    <button class="mode-btn active" id="btn-text" onclick="setMode('text')">Text / Writing</button>
+    <button class="mode-btn" id="btn-system" onclick="setMode('system')">System / Situation</button>
+  </div>
+
+  <div class="input-card" id="panel-text">
+    <div class="field-label">Input</div>
+    <textarea class="nc-textarea" id="input-text" maxlength="800"
+      placeholder="Paste any writing — an article, a strategy doc, a creative brief, a speech, a pitch, an argument, a story..."
+      oninput="updateCount('text-count', 'input-text')"></textarea>
+    <div class="char-count"><span id="text-count">0</span> / 800</div>
+  </div>
+
+  <div class="input-card hidden" id="panel-system">
+    <div class="field-label">System or Situation</div>
+    <textarea class="nc-textarea" id="input-system" maxlength="600"
+      placeholder="Describe any system, organization, relationship, market, team dynamic, creative process, or recurring situation..."
+      oninput="updateCount('system-count', 'input-system')" style="min-height:120px;"></textarea>
+    <div class="char-count"><span id="system-count">0</span> / 600</div>
+  </div>
+
+  <button class="cta-btn" id="extract-btn" onclick="runExtract()">Extract Patterns →</button>
+  <div class="error-msg" id="error-msg"></div>
+
+  <div class="loading" id="loading">
+    <div class="loading-bar"><div class="loading-fill"></div></div>
+    <div class="loading-label" id="loading-label">Scanning for patterns...</div>
+  </div>
+
+  <div class="output" id="output">
+    <hr class="divider">
+
+    <div class="sec-label">Patterns Found</div>
+    <div class="pattern-list" id="pattern-list"></div>
+
+    <hr class="divider">
+    <div class="sec-label">Tension Map</div>
+    <div class="tension-list" id="tension-list"></div>
+
+    <hr class="divider">
+    <div class="sec-label">Master Signal</div>
+    <div class="master-card">
+      <div class="master-label">The Pattern Behind the Patterns</div>
+      <div class="master-text" id="master-text"></div>
+      <div class="master-action" id="master-action"></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-brand">GRAVIFI<span>CER</span></div>
+    <div class="footer-copy">Instrument 06 · MVANNP<br>© 2026 MVANNP / Gravificer. All rights reserved. Powered by Claude — Anthropic.</div>
+  </div>
+
+</main>
+
+<script>
+let mode = 'text';
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('btn-text').classList.toggle('active', m === 'text');
+  document.getElementById('btn-system').classList.toggle('active', m === 'system');
+  document.getElementById('panel-text').classList.toggle('hidden', m !== 'text');
+  document.getElementById('panel-system').classList.toggle('hidden', m !== 'system');
+}
+
+function updateCount(countId, inputId) {
+  document.getElementById(countId).textContent =
+    document.getElementById(inputId).value.length;
+}
+
+function getText() {
+  return mode === 'text'
+    ? document.getElementById('input-text').value.trim()
+    : document.getElementById('input-system').value.trim();
+}
+
+function setLoad(on, msg) {
+  document.getElementById('loading').classList.toggle('visible', on);
+  document.getElementById('extract-btn').disabled = on;
+  if (msg) document.getElementById('loading-label').textContent = msg;
+}
+
+function showErr(msg) {
+  const e = document.getElementById('error-msg');
+  e.textContent = msg; e.classList.add('visible');
+}
+
+function hideErr() { document.getElementById('error-msg').classList.remove('visible'); }
+
+const PATTERN_TYPES = {
+  'Recurring':  { color: '#00ff88', bg: 'rgba(0,255,136,0.1)' },
+  'Structural': { color: '#00d4ff', bg: 'rgba(0,212,255,0.1)' },
+  'Behavioral': { color: '#aa55ff', bg: 'rgba(170,85,255,0.1)' },
+  'Linguistic': { color: '#ffaa00', bg: 'rgba(255,170,0,0.1)'  },
+  'Systemic':   { color: '#ff5500', bg: 'rgba(255,85,0,0.1)'   },
+};
+
+function typeStyle(type) {
+  return PATTERN_TYPES[type] || { color: '#00ff88', bg: 'rgba(0,255,136,0.1)' };
+}
+
+const SYS_TEXT = `You are the Gravificer Pattern Extractor — a precision instrument for surfacing what's hidden in written content.
+
+Gravificer's Patterns pillar: Patterns is both raw input AND the sharpening vector that runs through Art, Energy, and Knowledge. Finding patterns is not about identifying the obvious — it's about revealing the structure beneath the surface.
+
+Analyze the input deeply. Return ONLY a valid JSON object — no markdown, no backticks, no preamble:
+
+{
+  "patterns": [
+    {
+      "name": "<short pattern name>",
+      "type": "<Recurring|Structural|Behavioral|Linguistic|Systemic>",
+      "strength": <integer 0-100, how dominant this pattern is>,
+      "read": "<2-3 sentences: what this pattern is and how it manifests>",
+      "implication": "<1 sentence: what this pattern means for the signal or system>"
+    }
+  ],
+  "tensions": [
+    {
+      "pole_a": "<one side of the tension>",
+      "pole_b": "<opposing side>",
+      "read": "<2 sentences: what this tension is and why it matters>"
+    }
+  ],
+  "master_signal": "<The single pattern that runs through all others — 1-2 sentences>",
+  "action": "<One specific, concrete recommendation based on the pattern analysis>"
+}
+
+Return 3-5 patterns. Return 2-3 tensions. Pattern types: Recurring (repeats), Structural (how it's built), Behavioral (how agents act), Linguistic (language patterns), Systemic (system-level dynamics). Be specific and surgical — not generic.`;
+
+const SYS_SYSTEM = `You are the Gravificer Pattern Extractor — a precision instrument for surfacing hidden patterns in systems and situations.
+
+Gravificer's Patterns pillar: Patterns is both raw input AND the sharpening vector. Finding patterns means revealing the invisible architecture that governs visible behavior.
+
+Analyze the described system or situation deeply. Return ONLY a valid JSON object — no markdown, no backticks, no preamble:
+
+{
+  "patterns": [
+    {
+      "name": "<short pattern name>",
+      "type": "<Recurring|Structural|Behavioral|Linguistic|Systemic>",
+      "strength": <integer 0-100>,
+      "read": "<2-3 sentences: what this pattern is and how it operates>",
+      "implication": "<1 sentence: what this pattern means for the system>"
+    }
+  ],
+  "tensions": [
+    {
+      "pole_a": "<one side of the tension>",
+      "pole_b": "<opposing side>",
+      "read": "<2 sentences: what drives this tension and what it produces>"
+    }
+  ],
+  "master_signal": "<The single pattern that governs all others in this system — 1-2 sentences>",
+  "action": "<One specific, concrete intervention point based on the pattern analysis>"
+}
+
+Return 3-5 patterns. Return 2-3 tensions. Be specific to what was described — no generic observations.`;
+
+async function runExtract() {
+  hideErr();
+  const text = getText();
+  if (!text) {
+    showErr('No input detected. Paste text or describe a system to analyze.');
+    return;
+  }
+
+  document.getElementById('output').classList.remove('visible');
+  setLoad(true, 'Scanning for patterns...');
+
+  const msgs = [
+    'Mapping recurring structures...',
+    'Identifying tension points...',
+    'Surfacing hidden architecture...',
+    'Isolating the master signal...',
+  ];
+  let mi = 0;
+  const t = setInterval(() => {
+    mi = (mi + 1) % msgs.length;
+    document.getElementById('loading-label').textContent = msgs[mi];
+  }, 1800);
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1400,
+        system: mode === 'text' ? SYS_TEXT : SYS_SYSTEM,
+        messages: [{ role: 'user', content: 'Extract patterns from:\n\n' + text }]
+      })
+    });
+
+    clearInterval(t); setLoad(false);
+    if (!res.ok) throw new Error('API ' + res.status);
+
+    const data = await res.json();
+    const raw = data.content.map(b => b.text || '').join('');
+    render(JSON.parse(raw.replace(/```json|```/g, '').trim()));
+  } catch(e) {
+    clearInterval(t); setLoad(false);
+    showErr('Extraction failed. Check your connection and try again.');
+    console.error(e);
+  }
+}
+
+function render(d) {
+  // Patterns
+  const pl = document.getElementById('pattern-list');
+  pl.innerHTML = '';
+  (d.patterns || []).forEach(p => {
+    const style = typeStyle(p.type);
+    const card = document.createElement('div');
+    card.className = 'pattern-card';
+    card.style.borderTop = `3px solid ${style.color}`;
+    card.innerHTML = `
+      <div class="pattern-header">
+        <div class="pattern-type-badge" style="background:${style.bg}; color:${style.color};">${p.type}</div>
+        <div class="pattern-name">${p.name}</div>
+        <div class="pattern-strength" style="color:${style.color};">${p.strength}%</div>
+      </div>
+      <div class="pattern-body">
+        <div class="pattern-read">${p.read}</div>
+        <div class="pattern-implication">${p.implication}</div>
+      </div>`;
+    pl.appendChild(card);
+  });
+
+  // Tensions
+  const tl = document.getElementById('tension-list');
+  tl.innerHTML = '';
+  (d.tensions || []).forEach(t => {
+    const item = document.createElement('div');
+    item.className = 'tension-item';
+    item.innerHTML = `
+      <div class="tension-poles">
+        <div class="tension-pole">${t.pole_a}</div>
+        <div class="tension-vs">VS</div>
+        <div class="tension-pole">${t.pole_b}</div>
+      </div>
+      <div class="tension-read">${t.read}</div>`;
+    tl.appendChild(item);
+  });
+
+  // Master signal
+  document.getElementById('master-text').textContent = d.master_signal || '';
+  document.getElementById('master-action').innerHTML =
+    `<strong>Recommended action:</strong> ${d.action || ''}`;
+
+  document.getElementById('output').classList.add('visible');
+  setTimeout(() => {
+    document.getElementById('output').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+</script>
+</body>
+</html>
