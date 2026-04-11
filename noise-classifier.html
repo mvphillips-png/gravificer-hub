@@ -553,18 +553,26 @@
 
   <div class="input-card" id="panel-free">
     <div class="field-label">Input</div>
-    <textarea class="nc-textarea" id="input-free"
-      placeholder="Paste anything — a headline, paragraph, pitch, brief, strategy, or concept..."></textarea>
+    <textarea class="nc-textarea" id="input-free" maxlength="600"
+      placeholder="Paste anything — a headline, paragraph, pitch, brief, strategy, or concept..."
+      oninput="updateCount('free-count', 'input-free')"></textarea>
+    <div style="font-size:11px; color:var(--faint); text-align:right; margin-top:8px;"><span id="free-count">0</span> / 600</div>
   </div>
 
   <div class="input-card hidden" id="panel-struct">
     <div class="field-label">Headline</div>
-    <input class="nc-input" id="input-headline" type="text" placeholder="Your headline or title..." />
-    <div class="field-label" style="margin-top:4px;">Body</div>
-    <textarea class="nc-textarea" id="input-body"
-      placeholder="Body copy or main content..." style="min-height:100px; margin-bottom:14px;"></textarea>
+    <input class="nc-input" id="input-headline" type="text" maxlength="200" placeholder="Your headline or title..."
+      oninput="updateCount('hl-count', 'input-headline')" />
+    <div style="font-size:11px; color:var(--faint); text-align:right; margin-top:-10px; margin-bottom:14px;"><span id="hl-count">0</span> / 200</div>
+    <div class="field-label">Body</div>
+    <textarea class="nc-textarea" id="input-body" maxlength="400"
+      placeholder="Body copy or main content..." style="min-height:100px; margin-bottom:6px;"
+      oninput="updateCount('body-count', 'input-body')"></textarea>
+    <div style="font-size:11px; color:var(--faint); text-align:right; margin-bottom:14px;"><span id="body-count">0</span> / 400</div>
     <div class="field-label">CTA / Closer</div>
-    <input class="nc-input" id="input-cta" type="text" placeholder="Call to action or closing statement..." style="margin-bottom:0;" />
+    <input class="nc-input" id="input-cta" type="text" maxlength="150" placeholder="Call to action or closing statement..."
+      style="margin-bottom:6px;" oninput="updateCount('cta-count', 'input-cta')" />
+    <div style="font-size:11px; color:var(--faint); text-align:right;"><span id="cta-count">0</span> / 150</div>
   </div>
 
   <button class="cta-btn" id="analyze-btn" onclick="runAnalysis()">Classify Noise →</button>
@@ -643,6 +651,11 @@ function hash(s) {
   let h=0;
   for(let i=0;i<s.length;i++) h=(Math.imul(31,h)+s.charCodeAt(i))|0;
   return h;
+}
+
+function updateCount(countId, inputId) {
+  document.getElementById(countId).textContent =
+    document.getElementById(inputId).value.length;
 }
 
 let mode = 'free';
