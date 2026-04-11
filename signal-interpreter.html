@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Signal Interpreter — Gravificer</title>
+<link rel="icon" href="gravificer-icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Exo+2:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
@@ -385,6 +386,8 @@
 </head>
 <body>
 
+
+
 <nav class="nav">
   <a class="nav-brand" href="index.html">GRAVIFI<span>CER</span></a>
   <a class="nav-back" href="index.html">← Hub</a>
@@ -523,22 +526,22 @@ async function runInterpret() {
   const t = setInterval(()=>{ mi=(mi+1)%msgs.length; document.getElementById('loading-label').textContent=msgs[mi]; },1900);
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:800,
-        system:SYS,
-        messages:[{role:'user',content:text}]
+    const res = await fetch('https://gravificer-proxy.mvphillips.workers.dev', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 800,
+        system: SYS,
+        messages: [{ role: 'user', content: text }]
       })
     });
 
     clearInterval(t); setLoad(false);
-    if(!res.ok) throw new Error('API '+res.status);
+    if (!res.ok) throw new Error('API ' + res.status);
 
     const data = await res.json();
-    const raw = data.content.map(b=>b.text||'').join('');
+    const raw = data.content.map(b => b.text || '').join('');
     const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
 
     document.getElementById('received-text').textContent = text;
@@ -547,9 +550,9 @@ async function runInterpret() {
     document.getElementById('out-reframe').textContent = parsed.reframe || '';
 
     document.getElementById('output').classList.add('visible');
-    setTimeout(()=>{
-      document.getElementById('output').scrollIntoView({behavior:'smooth',block:'start'});
-    },100);
+    setTimeout(() => {
+      document.getElementById('output').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
   } catch(e) {
     clearInterval(t); setLoad(false);
     showErr('Interpretation failed. Check your connection and try again.');
