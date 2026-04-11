@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Faction Scanner — Gravificer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Exo+2:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d1117;
+    --card: #161b22;
+    --card2: #1c2230;
+    --border: rgba(255,255,255,0.08);
+    --text: #e6edf3;
+    --muted: rgba(230,237,243,0.55);
+    --faint: rgba(230,237,243,0.3);
+    --accent: #ff5500;
+    --accent-dim: rgba(255,85,0,0.12);
+    --magenta: #ff0080;
+    --cyan: #00d4ff;
+    --amber: #ffaa00;
+    --green: #00ff88;
+    --purple: #aa55ff;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Exo 2', sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(13,17,23,0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-brand {
+    font-family: 'Orbitron', monospace;
+    font-size: 15px;
+    font-weight: 900;
+    color: var(--text);
+    letter-spacing: 3px;
+    text-decoration: none;
+  }
+
+  .nav-brand span { color: var(--magenta); }
+
+  .nav-back {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .nav-back:active { background: var(--card); color: var(--text); }
+
+  .main {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 36px 20px 80px;
+  }
+
+  .header { text-align: center; margin-bottom: 32px; }
+
+  .header-eye {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    color: var(--faint);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .header-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(20px, 6.5vw, 30px);
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: var(--text);
+    margin-bottom: 4px;
+    line-height: 1.1;
+  }
+
+  .header-title span { color: var(--accent); }
+
+  .header-sub {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 3px;
+    color: var(--faint);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .header-desc {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.75;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  /* Faction legend */
+  .faction-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+
+  .faction-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .faction-icon {
+    font-size: 20px;
+    min-width: 28px;
+    text-align: center;
+    margin-top: 1px;
+  }
+
+  .faction-body {}
+
+  .faction-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 3px;
+  }
+
+  .faction-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+
+  /* Questions */
+  .questions-wrap { display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; }
+
+  .question-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 18px 14px;
+    transition: border-color 0.2s;
+  }
+
+  .question-card.answered { border-color: rgba(255,85,0,0.3); }
+
+  .q-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .q-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent);
+    min-width: 24px;
+    padding-top: 2px;
+    opacity: 0.7;
+  }
+
+  .q-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  .q-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .q-option {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--muted);
+    font-family: 'Exo 2', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.5;
+    padding: 12px 14px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    width: 100%;
+  }
+
+  .q-option:active { transform: scale(0.98); }
+
+  .q-option.selected {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* Progress */
+  .progress-wrap { margin-bottom: 20px; }
+
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .progress-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--faint);
+    text-transform: uppercase;
+  }
+
+  .progress-count {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .progress-bar-bg {
+    height: 4px;
+    background: var(--card);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s cubic-bezier(0.22,1,0.36,1);
+  }
+
+  /* CTA */
+  .cta-btn {
+    width: 100%;
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius);
+    color: #fff;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 58px;
+  }
+
+  .cta-btn:active:not(:disabled) { transform: scale(0.97); opacity: 0.85; }
+  .cta-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  .error-msg {
+    background: rgba(255,0,80,0.1);
+    border: 1px solid rgba(255,0,80,0.25);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    font-size: 13px;
+    color: #ff5080;
+    text-align: center;
+    display: none;
+    margin-top: 12px;
+    line-height: 1.6;
+  }
+
+  .error-msg.visible { display: block; }
+
+  .loading { display: none; text-align: center; padding: 36px 20px; }
+  .loading.visible { display: block; }
+
+  .loading-bar {
+    width: 100%;
+    height: 3px;
+    background: var(--card);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 0 0 14px;
+  }
+
+  .loading-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--amber));
+    border-radius: 2px;
+    animation: load 2s ease-in-out infinite;
+  }
+
+  @keyframes load {
+    0%{width:0%;margin-left:0}
+    50%{width:55%;margin-left:25%}
+    100%{width:0%;margin-left:100%}
+  }
+
+  .loading-label {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    color: var(--faint);
+    text-transform: uppercase;
+  }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+
+  .output { display: none; }
+  .output.visible { display: block; }
+
+  .sec-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    color: var(--faint);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  /* Faction result */
+  .faction-result {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+
+  .faction-result-banner {
+    padding: 28px 22px 22px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .result-icon { font-size: 40px; margin-bottom: 12px; }
+
+  .result-faction {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(18px, 5vw, 24px);
+    font-weight: 900;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+
+  .result-tagline {
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    font-style: italic;
+  }
+
+  .faction-result-body { padding: 20px 22px; }
+
+  .result-profile {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.8;
+    margin-bottom: 16px;
+  }
+
+  /* Trait bars */
+  .trait-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 4px; }
+
+  .trait-row { display: flex; flex-direction: column; gap: 5px; }
+
+  .trait-header { display: flex; justify-content: space-between; }
+
+  .trait-name { font-size: 12px; font-weight: 600; color: var(--text); }
+  .trait-score { font-size: 12px; font-weight: 600; color: var(--muted); }
+
+  .trait-bar-bg {
+    height: 5px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .trait-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    width: 0%;
+    transition: width 0.9s cubic-bezier(0.22,1,0.36,1);
+  }
+
+  /* Faction alignment */
+  .alignment-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 12px;
+  }
+
+  .alignment-bars { display: flex; flex-direction: column; gap: 12px; }
+
+  .align-row { display: flex; flex-direction: column; gap: 5px; }
+  .align-header { display: flex; justify-content: space-between; }
+  .align-name { font-size: 13px; font-weight: 600; }
+  .align-pct { font-family: 'Orbitron', monospace; font-size: 12px; font-weight: 700; }
+
+  /* Signal tendency */
+  .tendency-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 22px 20px;
+  }
+
+  .tendency-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    opacity: 0.8;
+  }
+
+  .tendency-text {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  /* Reset */
+  .reset-btn {
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--muted);
+    font-family: 'Exo 2', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 14px;
+    cursor: pointer;
+    margin-top: 16px;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .reset-btn:active { background: var(--card); color: var(--text); }
+
+  .footer {
+    text-align: center;
+    margin-top: 52px;
+    padding-top: 28px;
+    border-top: 1px solid var(--border);
+  }
+
+  .footer-brand {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: var(--faint);
+  }
+
+  .footer-brand span { color: rgba(255,0,128,0.5); }
+  .footer-copy { font-size: 11px; color: rgba(230,237,243,0.25); margin-top: 6px; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-brand" href="index.html">GRAVIFI<span>CER</span></a>
+  <a class="nav-back" href="index.html">← Hub</a>
+</nav>
+
+<main class="main">
+
+  <div class="header">
+    <div class="header-eye">Instrument 05</div>
+    <h1 class="header-title">FACTION <span>SCANNER</span></h1>
+    <div class="header-sub">Assess · Place · Profile</div>
+    <p class="header-desc">In the Krovxar universe, perceived reality is the primary commodity. Every signal behavior maps to one of three factions. Ten questions. One placement. A mirror for how you actually process the world.</p>
+  </div>
+
+  <div class="faction-legend">
+    <div class="faction-item" style="border-left: 3px solid var(--cyan);">
+      <div class="faction-icon">◈</div>
+      <div class="faction-body">
+        <div class="faction-name" style="color:var(--cyan);">THE ARCHITECTS</div>
+        <div class="faction-desc">Shape the signal deliberately. They design perception systems, control narrative frames, and build the infrastructure others live inside. They see the lattice — and build it.</div>
+      </div>
+    </div>
+    <div class="faction-item" style="border-left: 3px solid var(--accent);">
+      <div class="faction-icon">◉</div>
+      <div class="faction-body">
+        <div class="faction-name" style="color:var(--accent);">THE TUNED</div>
+        <div class="faction-desc">Read the signal with precision. Highly aware, adaptive, able to navigate multiple realities simultaneously. They don't build the lattice — they move through it better than anyone.</div>
+      </div>
+    </div>
+    <div class="faction-item" style="border-left: 3px solid var(--muted);">
+      <div class="faction-icon">◬</div>
+      <div class="faction-body">
+        <div class="faction-name" style="color:var(--muted);">THE STATIC</div>
+        <div class="faction-desc">Receive whatever signal is loudest. Not passive — often intensely active — but operating inside frames they didn't choose and can't fully see. The noise runs them.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="progress-wrap" id="progress-wrap">
+    <div class="progress-header">
+      <div class="progress-label">Progress</div>
+      <div class="progress-count"><span id="answered-count">0</span> / 10</div>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progress-fill" style="width:0%;"></div>
+    </div>
+  </div>
+
+  <div class="questions-wrap" id="questions-wrap"></div>
+
+  <button class="cta-btn" id="scan-btn" onclick="runScan()" disabled>Reveal My Faction →</button>
+  <div class="error-msg" id="error-msg"></div>
+
+  <div class="loading" id="loading">
+    <div class="loading-bar"><div class="loading-fill"></div></div>
+    <div class="loading-label" id="loading-label">Scanning signal patterns...</div>
+  </div>
+
+  <div class="output" id="output">
+    <hr class="divider">
+    <div class="sec-label">Faction Placement</div>
+    <div class="faction-result" id="faction-result"></div>
+
+    <hr class="divider">
+    <div class="sec-label">Faction Alignment</div>
+    <div class="alignment-card" id="alignment-card"></div>
+
+    <hr class="divider">
+    <div class="sec-label">Signal Tendency</div>
+    <div class="tendency-card">
+      <div class="tendency-label">How You Move Through the Lattice</div>
+      <div class="tendency-text" id="tendency-text"></div>
+    </div>
+
+    <button class="reset-btn" onclick="resetScanner()">← Retake the Scan</button>
+  </div>
+
+  <div class="footer">
+    <div class="footer-brand">GRAVIFI<span>CER</span></div>
+    <div class="footer-copy">Instrument 05 · MVANNP<br>© 2026 MVANNP / Gravificer. All rights reserved. Powered by Claude — Anthropic.</div>
+  </div>
+
+</main>
+
+<script>
+const QUESTIONS = [
+  {
+    q: "When you encounter a piece of information, what's your first instinct?",
+    options: [
+      { text: "Figure out how I can use it to shape a situation or outcome", faction: "A" },
+      { text: "Read between the lines — what's it actually saying beneath the surface?", faction: "T" },
+      { text: "Take it at face value and react accordingly", faction: "S" },
+    ]
+  },
+  {
+    q: "You're in a meeting where the real agenda is different from the stated one. What happens?",
+    options: [
+      { text: "I often set the hidden agenda myself", faction: "A" },
+      { text: "I pick up on it quickly and adjust my position accordingly", faction: "T" },
+      { text: "I usually find out after the fact", faction: "S" },
+    ]
+  },
+  {
+    q: "How do you relate to the narratives that dominate your industry or field?",
+    options: [
+      { text: "I actively try to change or replace them", faction: "A" },
+      { text: "I can see through them clearly, even if I work within them", faction: "T" },
+      { text: "They shape how I think more than I probably realize", faction: "S" },
+    ]
+  },
+  {
+    q: "When you create something — a message, a design, a strategy — what drives you?",
+    options: [
+      { text: "A specific effect I want to produce in a specific audience", faction: "A" },
+      { text: "Expressing something I've observed or understood about how things actually work", faction: "T" },
+      { text: "A feeling or impulse that I follow without fully analyzing it", faction: "S" },
+    ]
+  },
+  {
+    q: "Someone presents you with a compelling story. What's your response?",
+    options: [
+      { text: "I immediately think about the structure — how the story was built to land", faction: "A" },
+      { text: "I enjoy it while also noticing what it's doing to me emotionally", faction: "T" },
+      { text: "I get pulled in — it's hard to separate myself from it in the moment", faction: "S" },
+    ]
+  },
+  {
+    q: "How do you handle noise in your own thinking?",
+    options: [
+      { text: "I design systems to filter it before it reaches me", faction: "A" },
+      { text: "I've trained myself to recognize it and step back when I notice it", faction: "T" },
+      { text: "It's often only obvious in hindsight", faction: "S" },
+    ]
+  },
+  {
+    q: "What's your relationship with influence — your own or others'?",
+    options: [
+      { text: "I think about how I'm influencing a situation in almost every interaction", faction: "A" },
+      { text: "I'm aware of influence flows and try to stay conscious of them", faction: "T" },
+      { text: "I tend to notice I've been influenced more than I notice I'm influencing", faction: "S" },
+    ]
+  },
+  {
+    q: "When something disrupts your understanding of a situation, what happens?",
+    options: [
+      { text: "I reframe the situation and rebuild my model quickly", faction: "A" },
+      { text: "I sit with the dissonance until I find the deeper pattern", faction: "T" },
+      { text: "It takes time — disruption tends to knock me off balance before I recover", faction: "S" },
+    ]
+  },
+  {
+    q: "What does 'signal' mean to you in your daily work?",
+    options: [
+      { text: "Something I construct and deploy intentionally", faction: "A" },
+      { text: "Something I read and translate — what's actually being communicated beneath the surface", faction: "T" },
+      { text: "Something I respond to — it's the input, I'm the output", faction: "S" },
+    ]
+  },
+  {
+    q: "If you're honest with yourself — who is running your attention most of the time?",
+    options: [
+      { text: "Mostly me — I decide what gets my attention and for how long", faction: "A" },
+      { text: "A mix — I have strong awareness but still get pulled sometimes", faction: "T" },
+      { text: "Often external forces — notifications, expectations, the loudest voice in the room", faction: "S" },
+    ]
+  },
+];
+
+let answers = new Array(10).fill(null);
+
+function buildQuestions() {
+  const wrap = document.getElementById('questions-wrap');
+  wrap.innerHTML = '';
+  QUESTIONS.forEach((q, qi) => {
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.id = `q-card-${qi}`;
+
+    const shuffled = [...q.options].sort(() => Math.random() - 0.5);
+
+    card.innerHTML = `
+      <div class="q-header">
+        <div class="q-num">${String(qi+1).padStart(2,'0')}</div>
+        <div class="q-text">${q.q}</div>
+      </div>
+      <div class="q-options" id="opts-${qi}">
+        ${shuffled.map((opt, oi) => `
+          <button class="q-option" onclick="selectOption(${qi}, '${opt.faction}', this)">
+            ${opt.text}
+          </button>`).join('')}
+      </div>`;
+    wrap.appendChild(card);
+  });
+}
+
+function selectOption(qi, faction, btn) {
+  const opts = document.querySelectorAll(`#opts-${qi} .q-option`);
+  opts.forEach(o => o.classList.remove('selected'));
+  btn.classList.add('selected');
+  answers[qi] = faction;
+
+  document.getElementById(`q-card-${qi}`).classList.add('answered');
+
+  const answered = answers.filter(a => a !== null).length;
+  document.getElementById('answered-count').textContent = answered;
+  document.getElementById('progress-fill').style.width = (answered / 10 * 100) + '%';
+  document.getElementById('scan-btn').disabled = answered < 10;
+}
+
+function setLoad(on, msg) {
+  document.getElementById('loading').classList.toggle('visible', on);
+  document.getElementById('scan-btn').disabled = on;
+  if (msg) document.getElementById('loading-label').textContent = msg;
+}
+
+function showErr(msg) {
+  const e = document.getElementById('error-msg');
+  e.textContent = msg; e.classList.add('visible');
+}
+
+function hideErr() { document.getElementById('error-msg').classList.remove('visible'); }
+
+const SYS = `You are the Gravificer Faction Scanner — a signal behavior profiling instrument from the Krovxar universe.
+
+The three factions:
+- ARCHITECTS: Deliberately shape perception. Build signal systems. Control narrative frames. They design the lattice others live inside.
+- TUNED: Read signals with precision. Highly aware and adaptive. Navigate multiple realities. They move through the lattice better than anyone.
+- STATIC: Receive whatever signal is loudest. Active but operating inside frames they didn't choose. The noise runs them.
+
+The user answered 10 questions. Each answer is tagged A (Architect), T (Tuned), or S (Static).
+
+Based on the pattern of answers, return ONLY a valid JSON object — no markdown, no backticks:
+
+{
+  "primary_faction": "<Architects|Tuned|Static>",
+  "faction_icon": "<◈ for Architects, ◉ for Tuned, ◬ for Static>",
+  "faction_color": "<#00d4ff for Architects, #ff5500 for Tuned, #888899 for Static>",
+  "tagline": "<A short evocative phrase that captures this person's signal mode — 4-7 words>",
+  "profile": "<3-4 sentences: a precise, specific profile of this person's signal behavior based on their answer pattern. Not generic — read the specific pattern>",
+  "alignment": {
+    "architects": <integer 0-100, percentage lean toward Architects>,
+    "tuned": <integer 0-100, percentage lean toward Tuned>,
+    "static": <integer 0-100, percentage lean toward Static>
+  },
+  "traits": [
+    { "name": "<trait name>", "score": <0-100> },
+    { "name": "<trait name>", "score": <0-100> },
+    { "name": "<trait name>", "score": <0-100> }
+  ],
+  "tendency": "<One precise, revelatory sentence about how this person moves through the signal landscape — their defining signal behavior>"
+}
+
+The three alignment scores must sum to 100. Traits should be specific to their pattern — not generic. Examples: Signal Awareness, Frame Control, Narrative Agility, Noise Resistance, Adaptive Reading, Perception Design.`;
+
+async function runScan() {
+  hideErr();
+  if (answers.filter(a => a !== null).length < 10) {
+    showErr('Answer all 10 questions to reveal your faction.');
+    return;
+  }
+
+  document.getElementById('output').classList.remove('visible');
+  setLoad(true, 'Scanning signal patterns...');
+
+  const msgs = ['Mapping signal behavior...','Analyzing faction alignment...','Generating your profile...'];
+  let mi = 0;
+  const t = setInterval(() => {
+    mi = (mi + 1) % msgs.length;
+    document.getElementById('loading-label').textContent = msgs[mi];
+  }, 1800);
+
+  const answerSummary = answers.map((a, i) => {
+    const fMap = { A: 'Architect', T: 'Tuned', S: 'Static' };
+    return `Q${i+1}: ${fMap[a]}`;
+  }).join(', ');
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: SYS,
+        messages: [{ role: 'user', content: `Answer pattern: ${answerSummary}` }]
+      })
+    });
+
+    clearInterval(t); setLoad(false);
+    if (!res.ok) throw new Error('API ' + res.status);
+
+    const data = await res.json();
+    const raw = data.content.map(b => b.text || '').join('');
+    render(JSON.parse(raw.replace(/```json|```/g, '').trim()));
+  } catch(e) {
+    clearInterval(t); setLoad(false);
+    showErr('Scan failed. Check your connection and try again.');
+    console.error(e);
+  }
+}
+
+function render(d) {
+  const color = d.faction_color || 'var(--accent)';
+
+  // Faction result banner
+  const result = document.getElementById('faction-result');
+  result.style.borderTop = `3px solid ${color}`;
+  result.innerHTML = `
+    <div class="faction-result-banner">
+      <div class="result-icon">${d.faction_icon || '◉'}</div>
+      <div class="result-faction" style="color:${color};">${(d.primary_faction || '').toUpperCase()}</div>
+      <div class="result-tagline">${d.tagline || ''}</div>
+    </div>
+    <div class="faction-result-body">
+      <div class="result-profile">${d.profile || ''}</div>
+      <div class="trait-list" id="trait-list"></div>
+    </div>`;
+
+  // Traits
+  const tl = document.getElementById('trait-list');
+  (d.traits || []).forEach(tr => {
+    const row = document.createElement('div');
+    row.className = 'trait-row';
+    row.innerHTML = `
+      <div class="trait-header">
+        <span class="trait-name">${tr.name}</span>
+        <span class="trait-score">${tr.score}%</span>
+      </div>
+      <div class="trait-bar-bg">
+        <div class="trait-bar-fill" style="background:${color};" data-pct="${tr.score}"></div>
+      </div>`;
+    tl.appendChild(row);
+  });
+
+  // Alignment
+  const al = d.alignment || { architects: 33, tuned: 33, static: 34 };
+  const ac = document.getElementById('alignment-card');
+  ac.innerHTML = `<div class="sec-label" style="margin-bottom:16px;">Faction Alignment</div>
+    <div class="alignment-bars">
+      <div class="align-row">
+        <div class="align-header">
+          <span class="align-name" style="color:#00d4ff;">Architects</span>
+          <span class="align-pct" style="color:#00d4ff;">${al.architects}%</span>
+        </div>
+        <div class="trait-bar-bg"><div class="trait-bar-fill" style="background:#00d4ff;" data-pct="${al.architects}"></div></div>
+      </div>
+      <div class="align-row">
+        <div class="align-header">
+          <span class="align-name" style="color:#ff5500;">Tuned</span>
+          <span class="align-pct" style="color:#ff5500;">${al.tuned}%</span>
+        </div>
+        <div class="trait-bar-bg"><div class="trait-bar-fill" style="background:#ff5500;" data-pct="${al.tuned}"></div></div>
+      </div>
+      <div class="align-row">
+        <div class="align-header">
+          <span class="align-name" style="color:#888899;">Static</span>
+          <span class="align-pct" style="color:#888899;">${al.static}%</span>
+        </div>
+        <div class="trait-bar-bg"><div class="trait-bar-fill" style="background:#888899;" data-pct="${al.static}"></div></div>
+      </div>
+    </div>`;
+
+  // Tendency
+  document.getElementById('tendency-text').textContent = d.tendency || '';
+
+  document.getElementById('output').classList.add('visible');
+
+  setTimeout(() => {
+    document.querySelectorAll('.trait-bar-fill, .bal-bar-fill').forEach(el => {
+      el.style.width = el.dataset.pct + '%';
+    });
+    document.getElementById('output').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 120);
+}
+
+function resetScanner() {
+  answers = new Array(10).fill(null);
+  document.getElementById('answered-count').textContent = '0';
+  document.getElementById('progress-fill').style.width = '0%';
+  document.getElementById('scan-btn').disabled = true;
+  document.getElementById('output').classList.remove('visible');
+  buildQuestions();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+buildQuestions();
+</script>
+</body>
+</html>
