@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Noise Classifier — Gravificer</title>
+<title>Lens Engine — Gravificer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Exo+2:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
@@ -14,12 +14,12 @@
     --card: #161b22;
     --card2: #1c2230;
     --border: rgba(255,255,255,0.08);
-    --border-active: rgba(255,0,128,0.4);
     --text: #e6edf3;
     --muted: rgba(230,237,243,0.55);
     --faint: rgba(230,237,243,0.3);
-    --accent: #ff0080;
-    --accent-dim: rgba(255,0,128,0.15);
+    --accent: #aa55ff;
+    --accent-dim: rgba(170,85,255,0.12);
+    --magenta: #ff0080;
     --cyan: #00d4ff;
     --amber: #ffaa00;
     --green: #00ff88;
@@ -35,7 +35,6 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Nav */
   .nav {
     position: sticky;
     top: 0;
@@ -60,7 +59,7 @@
     text-decoration: none;
   }
 
-  .nav-brand span { color: var(--accent); }
+  .nav-brand span { color: var(--magenta); }
 
   .nav-back {
     display: flex;
@@ -77,20 +76,15 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  .nav-back:active {
-    background: var(--card);
-    color: var(--text);
-  }
+  .nav-back:active { background: var(--card); color: var(--text); }
 
-  /* Main */
   .main {
     max-width: 520px;
     margin: 0 auto;
     padding: 36px 20px 80px;
   }
 
-  /* Header */
-  .header { text-align: center; margin-bottom: 36px; }
+  .header { text-align: center; margin-bottom: 32px; }
 
   .header-eye {
     font-size: 11px;
@@ -103,7 +97,7 @@
 
   .header-title {
     font-family: 'Orbitron', monospace;
-    font-size: clamp(22px, 7vw, 32px);
+    font-size: clamp(20px, 6.5vw, 30px);
     font-weight: 900;
     letter-spacing: 2px;
     color: var(--text);
@@ -126,44 +120,51 @@
     font-size: 14px;
     color: var(--muted);
     line-height: 1.75;
-    max-width: 380px;
+    max-width: 400px;
     margin: 0 auto;
   }
 
-  /* Mode toggle */
-  .mode-wrap {
+  /* Lens legend */
+  .lens-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .lens-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 4px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4px;
-    margin-bottom: 16px;
+    border-radius: var(--radius-sm);
+    padding: 11px 14px;
   }
 
-  .mode-btn {
-    background: transparent;
-    border: none;
-    border-radius: 10px;
-    color: var(--muted);
-    font-family: 'Exo 2', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    padding: 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-    -webkit-tap-highlight-color: transparent;
-    letter-spacing: 0.5px;
+  .lens-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent);
+    min-width: 20px;
+    opacity: 0.7;
   }
 
-  .mode-btn.active {
-    background: var(--card2);
+  .lens-name {
+    font-size: 12px;
+    font-weight: 700;
     color: var(--text);
-    border: 1px solid var(--border);
+    min-width: 80px;
   }
 
-  /* Input card */
+  .lens-def {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+
+  /* Input */
   .input-card {
     background: var(--card);
     border: 1px solid var(--border);
@@ -172,8 +173,6 @@
     margin-bottom: 12px;
   }
 
-  .input-card.hidden { display: none; }
-
   .field-label {
     font-size: 11px;
     font-weight: 600;
@@ -181,7 +180,7 @@
     color: var(--accent);
     text-transform: uppercase;
     margin-bottom: 10px;
-    opacity: 0.8;
+    opacity: 0.85;
   }
 
   .nc-textarea {
@@ -195,36 +194,25 @@
     line-height: 1.7;
     padding: 14px 16px;
     resize: none;
-    min-height: 140px;
+    min-height: 130px;
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
     -webkit-appearance: none;
   }
 
   .nc-textarea::placeholder { color: #7a8794; }
-  .nc-textarea:focus { border-color: rgba(255,0,128,0.5); box-shadow: 0 0 0 3px rgba(255,0,128,0.1); }
-
-  .nc-input {
-    width: 100%;
-    background: #e8ecf0;
-    border: 1px solid rgba(0,0,0,0.1);
-    border-radius: var(--radius-sm);
-    color: #0d1117;
-    font-family: 'Exo 2', sans-serif;
-    font-size: 15px;
-    padding: 14px 16px;
-    outline: none;
-    margin-bottom: 14px;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    -webkit-appearance: none;
-    height: 52px;
+  .nc-textarea:focus {
+    border-color: rgba(170,85,255,0.5);
+    box-shadow: 0 0 0 3px rgba(170,85,255,0.1);
   }
 
-  .nc-input::placeholder { color: #7a8794; }
-  .nc-input:last-of-type { margin-bottom: 0; }
-  .nc-input:focus { border-color: rgba(255,0,128,0.5); box-shadow: 0 0 0 3px rgba(255,0,128,0.1); }
+  .char-count {
+    font-size: 11px;
+    color: var(--faint);
+    text-align: right;
+    margin-top: 8px;
+  }
 
-  /* CTA button */
   .cta-btn {
     width: 100%;
     background: var(--accent);
@@ -234,7 +222,7 @@
     font-family: 'Exo 2', sans-serif;
     font-size: 16px;
     font-weight: 700;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     padding: 18px;
     cursor: pointer;
     transition: all 0.2s;
@@ -242,14 +230,9 @@
     min-height: 58px;
   }
 
-  .cta-btn:active:not(:disabled) {
-    transform: scale(0.97);
-    opacity: 0.85;
-  }
-
+  .cta-btn:active:not(:disabled) { transform: scale(0.97); opacity: 0.85; }
   .cta-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
-  /* Error */
   .error-msg {
     background: rgba(255,0,80,0.1);
     border: 1px solid rgba(255,0,80,0.25);
@@ -265,13 +248,7 @@
 
   .error-msg.visible { display: block; }
 
-  /* Loading */
-  .loading {
-    display: none;
-    text-align: center;
-    padding: 36px 20px;
-  }
-
+  .loading { display: none; text-align: center; padding: 36px 20px; }
   .loading.visible { display: block; }
 
   .loading-bar {
@@ -291,9 +268,9 @@
   }
 
   @keyframes load {
-    0%   { width:0%; margin-left:0 }
-    50%  { width:55%; margin-left:25% }
-    100% { width:0%; margin-left:100% }
+    0%{width:0%;margin-left:0}
+    50%{width:55%;margin-left:25%}
+    100%{width:0%;margin-left:100%}
   }
 
   .loading-label {
@@ -304,18 +281,11 @@
     text-transform: uppercase;
   }
 
-  /* Divider */
-  .divider {
-    border: none;
-    border-top: 1px solid var(--border);
-    margin: 28px 0;
-  }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
 
-  /* Output */
   .output { display: none; }
   .output.visible { display: block; }
 
-  /* Section label */
   .sec-label {
     font-size: 11px;
     font-weight: 600;
@@ -325,247 +295,140 @@
     margin-bottom: 16px;
   }
 
-  /* Score block */
-  .score-block {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px;
-    margin-bottom: 4px;
-  }
-
-  .ring-wrap {
-    position: relative;
-    width: 88px; height: 88px;
-    flex-shrink: 0;
-  }
-
-  .ring-wrap svg { transform: rotate(-90deg); }
-
-  .ring-center {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .ring-pct {
-    font-family: 'Orbitron', monospace;
-    font-size: 20px;
-    font-weight: 900;
-    color: var(--text);
-    line-height: 1;
-  }
-
-  .ring-lbl {
-    font-size: 9px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    color: var(--faint);
-    text-transform: uppercase;
-    margin-top: 3px;
-  }
-
-  .score-meta { flex: 1; min-width: 0; }
-
-  .score-verdict {
-    font-family: 'Orbitron', monospace;
-    font-size: 13px;
-    font-weight: 700;
-    margin-bottom: 8px;
-    line-height: 1.3;
-  }
-
-  .score-desc {
-    font-size: 13px;
-    color: var(--muted);
-    line-height: 1.65;
-  }
-
-  /* Categories */
-  .cat-list {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    margin-bottom: 4px;
-  }
-
-  .cat-row { display: flex; flex-direction: column; gap: 6px; }
-
-  .cat-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .cat-name {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text);
-  }
-
-  .cat-count {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--muted);
-  }
-
-  .bar-bg {
-    height: 6px;
-    background: var(--card);
-    border-radius: 3px;
-    overflow: hidden;
-  }
-
-  .bar-fill {
-    height: 100%;
-    border-radius: 3px;
-    width: 0%;
-    transition: width 0.9s cubic-bezier(0.22,1,0.36,1);
-  }
-
-  /* Flagged */
-  .flag-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 4px;
-  }
-
-  .flag-item {
+  /* Received */
+  .received-card {
     background: var(--card);
     border: 1px solid var(--border);
     border-left: 3px solid var(--accent);
     border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
     padding: 14px 16px;
+    margin-bottom: 4px;
   }
 
-  .flag-phrase {
-    font-size: 14px;
+  .received-label {
+    font-size: 10px;
     font-weight: 600;
-    margin-bottom: 4px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    opacity: 0.7;
+  }
+
+  .received-text {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
     line-height: 1.5;
   }
 
-  .flag-reason {
-    font-size: 12px;
-    color: var(--muted);
-    line-height: 1.55;
-  }
-
-  .flag-examples {
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid var(--border);
-  }
-
-  .flag-examples-label {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    color: var(--faint);
-    text-transform: uppercase;
-    margin-bottom: 8px;
-  }
-
-  .flag-example-item {
-    display: flex;
-    gap: 8px;
-    align-items: flex-start;
-    margin-bottom: 6px;
-  }
-
-  .flag-example-dot {
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    margin-top: 8px;
-  }
-
-  .flag-example-text {
-    font-size: 12px;
-    color: var(--muted);
-    line-height: 1.55;
-  }
-
-  .flag-rewrite {
-    margin-top: 10px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 10px 12px;
-  }
-
-  .flag-rewrite-label {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    color: var(--faint);
-    text-transform: uppercase;
-    margin-bottom: 6px;
-  }
-
-  .flag-rewrite-text {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text);
-    line-height: 1.6;
-    font-style: italic;
-  }
-
-  .flag-type-tag {
-    display: inline-block;
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    padding: 2px 8px;
-    border-radius: 4px;
-    text-transform: uppercase;
-    margin-bottom: 6px;
-    background: var(--accent-dim);
-    color: var(--accent);
-  }
-
-  /* Removals */
-  .removal-list {
+  /* Lens cards */
+  .lens-cards {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
+    margin-bottom: 4px;
   }
 
-  .removal-item {
-    display: flex;
-    gap: 14px;
+  .lens-card {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 16px;
-    align-items: flex-start;
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: border-color 0.2s;
   }
 
-  .removal-num {
+  .lens-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .lens-card-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 900;
+    color: var(--accent);
+    min-width: 28px;
+    opacity: 0.6;
+  }
+
+  .lens-card-icon {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    background: var(--accent-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .lens-card-meta { flex: 1; min-width: 0; }
+
+  .lens-card-name {
     font-family: 'Orbitron', monospace;
     font-size: 11px;
     font-weight: 700;
-    color: var(--amber);
-    min-width: 24px;
-    padding-top: 1px;
-    flex-shrink: 0;
+    letter-spacing: 1.5px;
+    color: var(--text);
+    margin-bottom: 2px;
   }
 
-  .removal-text {
-    font-size: 14px;
+  .lens-card-question {
+    font-size: 11px;
+    color: var(--muted);
+    font-style: italic;
+    line-height: 1.4;
+  }
+
+  .lens-card-body {
+    padding: 16px 18px;
+  }
+
+  .lens-card-reframe {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.7;
+    margin-bottom: 10px;
+  }
+
+  .lens-card-detail {
+    font-size: 13px;
     color: var(--muted);
     line-height: 1.65;
   }
 
-  /* Footer */
+  /* Sharpest reframe */
+  .sharpest {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 22px 20px;
+    margin-bottom: 4px;
+  }
+
+  .sharpest-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    opacity: 0.8;
+  }
+
+  .sharpest-text {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.65;
+  }
+
   .footer {
     text-align: center;
     margin-top: 52px;
@@ -582,337 +445,233 @@
   }
 
   .footer-brand span { color: rgba(255,0,128,0.5); }
-
-  .footer-sub {
-    font-size: 11px;
-    color: rgba(230,237,243,0.2);
-    margin-top: 6px;
-    letter-spacing: 2px;
-  }
+  .footer-sub { font-size: 11px; color: rgba(230,237,243,0.2); margin-top: 6px; letter-spacing: 2px; }
 </style>
 </head>
 <body>
 
 <nav class="nav">
-  <a class="nav-brand" href="index.html">GRAVIFI<span>CER</span></a>
-  <a class="nav-back" href="index.html">← Hub</a>
+  <a class="nav-brand" href="/">GRAVIFI<span>CER</span></a>
+  <a class="nav-back" href="/">← Hub</a>
 </nav>
 
 <main class="main">
 
   <div class="header">
-    <div class="header-eye">Instrument 02</div>
-    <h1 class="header-title">NOISE <span>CLASSIFIER</span></h1>
-    <div class="header-sub">Detect · Categorize · Remove</div>
-    <p class="header-desc">Identifies and maps the noise in any written content. Returns a signal-to-noise score, flagged phrases, and surgical removal actions.</p>
+    <div class="header-eye">Instrument 04</div>
+    <h1 class="header-title">LENS <span>ENGINE</span></h1>
+    <div class="header-sub">Reframe · Shift · Reveal</div>
+    <p class="header-desc">Drop in any problem, situation, or idea. The Lens Engine forces it through five distinct perceptual lenses — returning reframes that change what's visible and what's possible.</p>
   </div>
 
-  <div class="mode-wrap">
-    <button class="mode-btn active" id="btn-free" onclick="setMode('free')">Free-Form</button>
-    <button class="mode-btn" id="btn-struct" onclick="setMode('struct')">Structured</button>
+  <div class="lens-legend">
+    <div class="lens-row">
+      <div class="lens-num">01</div>
+      <div class="lens-name">Power</div>
+      <div class="lens-def">Who controls this? Who benefits? What leverage exists?</div>
+    </div>
+    <div class="lens-row">
+      <div class="lens-num">02</div>
+      <div class="lens-name">Time</div>
+      <div class="lens-def">How does this look in 10 days, 10 months, 10 years?</div>
+    </div>
+    <div class="lens-row">
+      <div class="lens-num">03</div>
+      <div class="lens-name">Scale</div>
+      <div class="lens-def">What changes if this is 10x smaller or 10x larger?</div>
+    </div>
+    <div class="lens-row">
+      <div class="lens-num">04</div>
+      <div class="lens-name">Inversion</div>
+      <div class="lens-def">What if the opposite were true? What does that reveal?</div>
+    </div>
+    <div class="lens-row">
+      <div class="lens-num">05</div>
+      <div class="lens-name">Relationship</div>
+      <div class="lens-def">What does this look like from every other perspective?</div>
+    </div>
   </div>
 
-  <div class="input-card" id="panel-free">
-    <div class="field-label">Input</div>
-    <textarea class="nc-textarea" id="input-free" maxlength="600"
-      placeholder="Paste anything — a headline, paragraph, pitch, brief, strategy, or concept..."
-      oninput="updateCount('free-count', 'input-free')"></textarea>
-    <div style="font-size:11px; color:var(--faint); text-align:right; margin-top:8px;"><span id="free-count">0</span> / 600</div>
+  <div class="input-card">
+    <div class="field-label">Situation / Problem / Idea</div>
+    <textarea class="nc-textarea" id="lens-input" maxlength="500"
+      placeholder="Type anything — a decision you're stuck on, a creative block, a conflict, a belief, a strategy, a situation..."
+      oninput="updateCount()"></textarea>
+    <div class="char-count"><span id="char-count">0</span> / 500</div>
   </div>
 
-  <div class="input-card hidden" id="panel-struct">
-    <div class="field-label">Headline</div>
-    <input class="nc-input" id="input-headline" type="text" maxlength="200" placeholder="Your headline or title..."
-      oninput="updateCount('hl-count', 'input-headline')" />
-    <div style="font-size:11px; color:var(--faint); text-align:right; margin-top:-10px; margin-bottom:14px;"><span id="hl-count">0</span> / 200</div>
-    <div class="field-label">Body</div>
-    <textarea class="nc-textarea" id="input-body" maxlength="400"
-      placeholder="Body copy or main content..." style="min-height:100px; margin-bottom:6px;"
-      oninput="updateCount('body-count', 'input-body')"></textarea>
-    <div style="font-size:11px; color:var(--faint); text-align:right; margin-bottom:14px;"><span id="body-count">0</span> / 400</div>
-    <div class="field-label">CTA / Closer</div>
-    <input class="nc-input" id="input-cta" type="text" maxlength="150" placeholder="Call to action or closing statement..."
-      style="margin-bottom:6px;" oninput="updateCount('cta-count', 'input-cta')" />
-    <div style="font-size:11px; color:var(--faint); text-align:right;"><span id="cta-count">0</span> / 150</div>
-  </div>
-
-  <button class="cta-btn" id="analyze-btn" onclick="runAnalysis()">Classify Noise →</button>
+  <button class="cta-btn" id="lens-btn" onclick="runLens()">Run Lenses →</button>
   <div class="error-msg" id="error-msg"></div>
 
   <div class="loading" id="loading">
     <div class="loading-bar"><div class="loading-fill"></div></div>
-    <div class="loading-label" id="loading-label">Scanning for noise...</div>
+    <div class="loading-label" id="loading-label">Engaging lens 01...</div>
   </div>
 
   <div class="output" id="output">
     <hr class="divider">
 
-    <div class="sec-label">Signal / Noise Ratio</div>
-    <div class="score-block">
-      <div class="ring-wrap">
-        <svg width="88" height="88" viewBox="0 0 88 88">
-          <circle cx="44" cy="44" r="37" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="7"/>
-          <circle id="ring-s" cx="44" cy="44" r="37" fill="none"
-            stroke="#00d4ff" stroke-width="7" stroke-linecap="round"
-            stroke-dasharray="232.48" stroke-dashoffset="232.48"
-            style="transition:stroke-dashoffset 1s cubic-bezier(0.22,1,0.36,1)"/>
-          <circle cx="44" cy="44" r="26" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="5"/>
-          <circle id="ring-n" cx="44" cy="44" r="26" fill="none"
-            stroke="#ff0080" stroke-width="5" stroke-linecap="round"
-            stroke-dasharray="163.36" stroke-dashoffset="163.36"
-            style="transition:stroke-dashoffset 1s cubic-bezier(0.22,1,0.36,1) 0.15s"/>
-        </svg>
-        <div class="ring-center">
-          <div class="ring-pct" id="ring-pct">—</div>
-          <div class="ring-lbl">Signal</div>
-        </div>
-      </div>
-      <div class="score-meta">
-        <div class="score-verdict" id="score-verdict">—</div>
-        <div class="score-desc" id="score-desc"></div>
-      </div>
+    <div class="sec-label">Input</div>
+    <div class="received-card">
+      <div class="received-label">Situation</div>
+      <div class="received-text" id="received-text"></div>
     </div>
 
     <hr class="divider">
-    <div class="sec-label">Noise Categories</div>
-    <div class="cat-list" id="cat-list"></div>
+    <div class="sec-label">Five Lenses</div>
+    <div class="lens-cards" id="lens-cards"></div>
 
     <hr class="divider">
-    <div class="sec-label">Flagged Phrases</div>
-    <div class="flag-list" id="flag-list"></div>
-
-    <hr class="divider">
-    <div class="sec-label">Removal Actions</div>
-    <div class="removal-list" id="removal-list"></div>
+    <div class="sec-label">Sharpest Reframe</div>
+    <div class="sharpest">
+      <div class="sharpest-label">The Lens That Changes Everything</div>
+      <div class="sharpest-text" id="sharpest-text"></div>
+    </div>
   </div>
 
   <div class="footer">
     <div class="footer-brand">GRAVIFI<span>CER</span></div>
-    <div class="footer-sub">Instrument 02 · MVANNP<br>© 2026 MVANNP / Gravificer. All rights reserved. Powered by Claude — Anthropic.</div>
+    <div class="footer-sub">Instrument 04 · MVANNP<br>© 2026 MVANNP / Gravificer. All rights reserved. Powered by Claude — Anthropic.</div>
   </div>
 
 </main>
 
 <script>
-const CAT_COLORS = {
-  'Filler':'#00d4ff','Filler/Padding':'#00d4ff',
-  'Vague Language':'#ff0080','Vague/Abstract':'#ff0080',
-  'Redundancy':'#ffaa00',
-  'Generic Framing':'#aa55ff',
-  'Overload':'#ff5500'
-};
+const LENS_META = [
+  { num: '01', name: 'Power',        icon: '⚡', question: 'Who controls this? Where is the leverage?' },
+  { num: '02', name: 'Time',         icon: '◷', question: 'How does this look across 10 days, months, years?' },
+  { num: '03', name: 'Scale',        icon: '⊞', question: 'What changes at 10x smaller or 10x larger?' },
+  { num: '04', name: 'Inversion',    icon: '↺', question: 'What if the opposite were true?' },
+  { num: '05', name: 'Relationship', icon: '◎', question: 'What does this look like from every other angle?' },
+];
 
-function catColor(n) {
-  if (CAT_COLORS[n]) return CAT_COLORS[n];
-  const v = Object.values(CAT_COLORS);
-  return v[Math.abs(hash(n)) % v.length];
-}
-
-function hash(s) {
-  let h=0;
-  for(let i=0;i<s.length;i++) h=(Math.imul(31,h)+s.charCodeAt(i))|0;
-  return h;
-}
-
-function updateCount(countId, inputId) {
-  document.getElementById(countId).textContent =
-    document.getElementById(inputId).value.length;
-}
-
-let mode = 'free';
-
-function setMode(m) {
-  mode = m;
-  document.getElementById('btn-free').classList.toggle('active', m==='free');
-  document.getElementById('btn-struct').classList.toggle('active', m==='struct');
-  document.getElementById('panel-free').classList.toggle('hidden', m!=='free');
-  document.getElementById('panel-struct').classList.toggle('hidden', m!=='struct');
-}
-
-function getText() {
-  if (mode==='free') return document.getElementById('input-free').value.trim();
-  const parts=[];
-  const h=document.getElementById('input-headline').value.trim();
-  const b=document.getElementById('input-body').value.trim();
-  const c=document.getElementById('input-cta').value.trim();
-  if(h) parts.push('HEADLINE: '+h);
-  if(b) parts.push('BODY: '+b);
-  if(c) parts.push('CTA: '+c);
-  return parts.join('\n\n');
+function updateCount() {
+  document.getElementById('char-count').textContent =
+    document.getElementById('lens-input').value.length;
 }
 
 function setLoad(on, msg) {
   document.getElementById('loading').classList.toggle('visible', on);
-  document.getElementById('analyze-btn').disabled = on;
-  if(msg) document.getElementById('loading-label').textContent = msg;
+  document.getElementById('lens-btn').disabled = on;
+  if (msg) document.getElementById('loading-label').textContent = msg;
 }
 
 function showErr(msg) {
-  const e=document.getElementById('error-msg');
-  e.textContent=msg; e.classList.add('visible');
+  const e = document.getElementById('error-msg');
+  e.textContent = msg; e.classList.add('visible');
 }
 
 function hideErr() { document.getElementById('error-msg').classList.remove('visible'); }
 
-const SYS = `You are the Gravificer Noise Classifier — a precision instrument for detecting noise in written communication.
+const SYS = `You are the Gravificer Lens Engine — a precision instrument for forcing perception shifts.
+
+Given any problem, situation, belief, or idea, you apply five distinct perceptual lenses. Each lens reveals something the default view cannot see.
+
+The five lenses:
+1. Power — Who controls this? Who benefits? Where is the real leverage or dependency?
+2. Time — How does this look in 10 days, 10 months, 10 years? What does time reveal or dissolve?
+3. Scale — What changes if this is 10x smaller? 10x larger? What does scale expose about the assumptions?
+4. Inversion — What if the opposite were true? What does inverting the premise reveal?
+5. Relationship — What does this look like from every other stakeholder's, observer's, or opponent's perspective?
 
 Gravificer philosophy: Every output must clarify, reveal, or reframe — otherwise it is noise.
 
 Return ONLY a valid JSON object — no markdown, no backticks, no preamble:
 
 {
-  "signal_score": <integer 0-100>,
-  "verdict": "<4-6 word sharp assessment>",
-  "description": "<1-2 sentences on the signal condition>",
-  "categories": [
-    { "name": "<category>", "count": <integer> }
-  ],
-  "flagged": [
-    {
-      "phrase": "<exact or near-exact phrase>",
-      "type": "<category>",
-      "reason": "<short reason why it is noise>",
-      "examples": ["<a stronger alternative phrase or approach>", "<second alternative>"],
-      "rewrite": "<rewrite the flagged phrase or its surrounding sentence as clean signal>"
-    }
-  ],
-  "removals": [
-    "<specific actionable instruction>"
-  ]
+  "lenses": {
+    "power":        { "reframe": "<one sharp sentence — the reframe this lens delivers>", "detail": "<2 sentences expanding on what this lens reveals>" },
+    "time":         { "reframe": "<one sharp sentence>", "detail": "<2 sentences>" },
+    "scale":        { "reframe": "<one sharp sentence>", "detail": "<2 sentences>" },
+    "inversion":    { "reframe": "<one sharp sentence>", "detail": "<2 sentences>" },
+    "relationship": { "reframe": "<one sharp sentence>", "detail": "<2 sentences>" }
+  },
+  "sharpest": "<The single most powerful reframe across all five lenses — one sentence that changes what is possible>"
 }
 
-Noise categories (only include what is present):
-- Filler: zero-meaning words (e.g. "very," "really," "it is important to note")
-- Vague Language: non-specific abstractions (e.g. "leverage," "synergy," "world-class")
-- Redundancy: same idea repeated in different words
-- Generic Framing: could-apply-to-anything openers/closers
-- Overload: too many ideas in one sentence
+Each reframe must be specific to the input. No generic observations. The sharpest reframe should feel like a revelation.`;
 
-Return 3–6 flagged phrases. Each flagged phrase must include 2 specific alternative examples and a clean rewrite. Return 3–5 specific removal actions. Be surgical and direct.`;
-
-async function runAnalysis() {
+async function runLens() {
   hideErr();
-  const text = getText();
-  if(!text) { showErr('No input detected. Paste content to classify.'); return; }
+  const text = document.getElementById('lens-input').value.trim();
+  if (!text) { showErr('No input detected. Describe a situation or problem to reframe.'); return; }
 
   document.getElementById('output').classList.remove('visible');
-  setLoad(true, 'Scanning for noise...');
+  setLoad(true, 'Engaging lens 01...');
 
-  const msgs=['Mapping signal patterns...','Isolating noise categories...','Generating removal actions...'];
-  let mi=0;
-  const t=setInterval(()=>{ mi=(mi+1)%msgs.length; document.getElementById('loading-label').textContent=msgs[mi]; },1900);
+  const msgs = [
+    'Engaging lens 01 — Power...',
+    'Engaging lens 02 — Time...',
+    'Engaging lens 03 — Scale...',
+    'Engaging lens 04 — Inversion...',
+    'Engaging lens 05 — Relationship...',
+  ];
+  let mi = 0;
+  const t = setInterval(() => {
+    mi = Math.min(mi + 1, msgs.length - 1);
+    document.getElementById('loading-label').textContent = msgs[mi];
+  }, 1600);
 
   try {
-    const res = await fetch('https://gravificer-proxy.mvphillips.workers.dev',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1600,
-        system:SYS,
-        messages:[{role:'user',content:'Analyze:\n\n'+text}]
+    const res = await fetch('https://gravificer-proxy.mvphillips.workers.dev', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1200,
+        system: SYS,
+        messages: [{ role: 'user', content: 'Apply all five lenses to:\n\n' + text }]
       })
     });
 
     clearInterval(t); setLoad(false);
-    if(!res.ok) throw new Error('API '+res.status);
+    if (!res.ok) throw new Error('API ' + res.status);
 
-    const data=await res.json();
-    const raw=data.content.map(b=>b.text||'').join('');
-    render(JSON.parse(raw.replace(/```json|```/g,'').trim()));
+    const data = await res.json();
+    const raw = data.content.map(b => b.text || '').join('');
+    render(text, JSON.parse(raw.replace(/```json|```/g, '').trim()));
   } catch(e) {
     clearInterval(t); setLoad(false);
-    showErr('Classification failed. Check your connection and try again.');
+    showErr('Lens failed. Check your connection and try again.');
     console.error(e);
   }
 }
 
-function render(d) {
-  const sig = Math.min(100,Math.max(0,d.signal_score||0));
-  const noi = 100-sig;
-  const co=232.48, ci=163.36;
+const LENS_KEYS = ['power','time','scale','inversion','relationship'];
 
-  document.getElementById('ring-pct').textContent = sig+'%';
-  setTimeout(()=>{
-    document.getElementById('ring-s').style.strokeDashoffset = co*(1-sig/100);
-    document.getElementById('ring-n').style.strokeDashoffset = ci*(1-noi/100);
-  },80);
+function render(input, d) {
+  document.getElementById('received-text').textContent = input;
 
-  const vColor = sig>=70?'#00d4ff':sig>=45?'#ffaa00':'#ff0080';
-  const v=document.getElementById('score-verdict');
-  v.textContent=d.verdict||'—'; v.style.color=vColor;
-  document.getElementById('score-desc').textContent=d.description||'';
+  const lenses = d.lenses || {};
+  const container = document.getElementById('lens-cards');
+  container.innerHTML = '';
 
-  // Categories
-  const cats=d.categories||[];
-  const maxC=cats.reduce((m,c)=>Math.max(m,c.count),1);
-  const cl=document.getElementById('cat-list');
-  cl.innerHTML='';
-  cats.forEach(cat=>{
-    const col=catColor(cat.name);
-    const pct=Math.round((cat.count/maxC)*100);
-    const row=document.createElement('div');
-    row.className='cat-row';
-    row.innerHTML=`
-      <div class="cat-header">
-        <span class="cat-name">${cat.name}</span>
-        <span class="cat-count">${cat.count} instance${cat.count!==1?'s':''}</span>
+  LENS_META.forEach((meta, i) => {
+    const lens = lenses[meta.name.toLowerCase()] || {};
+    const card = document.createElement('div');
+    card.className = 'lens-card';
+    card.style.borderTop = '3px solid var(--accent)';
+    card.innerHTML = `
+      <div class="lens-card-header">
+        <div class="lens-card-num">${meta.num}</div>
+        <div class="lens-card-icon">${meta.icon}</div>
+        <div class="lens-card-meta">
+          <div class="lens-card-name">${meta.name.toUpperCase()}</div>
+          <div class="lens-card-question">${meta.question}</div>
+        </div>
       </div>
-      <div class="bar-bg">
-        <div class="bar-fill" style="background:${col};" data-pct="${pct}"></div>
+      <div class="lens-card-body">
+        <div class="lens-card-reframe">${lens.reframe || ''}</div>
+        <div class="lens-card-detail">${lens.detail || ''}</div>
       </div>`;
-    cl.appendChild(row);
-  });
-  setTimeout(()=>{
-    cl.querySelectorAll('.bar-fill').forEach(el=>{ el.style.width=el.dataset.pct+'%'; });
-  },120);
-
-  // Flagged
-  const fl=document.getElementById('flag-list');
-  fl.innerHTML='';
-  (d.flagged||[]).forEach(f=>{
-    const col=catColor(f.type);
-    const item=document.createElement('div');
-    item.className='flag-item';
-    item.style.borderLeftColor=col;
-
-    const examplesHtml = (f.examples||[]).map(ex=>`
-      <div class="flag-example-item">
-        <div class="flag-example-dot" style="background:${col};"></div>
-        <div class="flag-example-text">${ex}</div>
-      </div>`).join('');
-
-    item.innerHTML=`
-      <div class="flag-type-tag" style="background:${col}22;color:${col};">${f.type}</div>
-      <div class="flag-phrase">"${f.phrase}"</div>
-      <div class="flag-reason">${f.reason}</div>
-      ${examplesHtml ? `
-      <div class="flag-examples">
-        <div class="flag-examples-label">Stronger alternatives</div>
-        ${examplesHtml}
-      </div>` : ''}
-      ${f.rewrite ? `
-      <div class="flag-rewrite">
-        <div class="flag-rewrite-label">Rewrite</div>
-        <div class="flag-rewrite-text">"${f.rewrite}"</div>
-      </div>` : ''}`;
-    fl.appendChild(item);
+    container.appendChild(card);
   });
 
-  // Removals
-  const rl=document.getElementById('removal-list');
-  rl.innerHTML='';
-  (d.removals||[]).forEach((r,i)=>{
-    const item=document.createElement('div');
-    item.className='removal-item';
-    item.innerHTML=`<div class="removal-num">R${i+1}</div><div class="removal-text">${r}</div>`;
-    rl.appendChild(item);
-  });
-
+  document.getElementById('sharpest-text').textContent = d.sharpest || '';
   document.getElementById('output').classList.add('visible');
-  setTimeout(()=>{
-    document.getElementById('output').scrollIntoView({behavior:'smooth',block:'start'});
-  },100);
+  setTimeout(() => {
+    document.getElementById('output').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
 }
 </script>
 </body>
