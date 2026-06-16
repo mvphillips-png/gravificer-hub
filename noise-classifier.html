@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Lens Engine — Gravificer</title>
+<title>Noise Classifier — Gravificer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Exo+2:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
@@ -458,101 +458,108 @@
 <main class="main">
 
   <div class="header">
-    <div class="header-eye">Instrument 04</div>
-    <h1 class="header-title">LENS <span>ENGINE</span></h1>
-    <div class="header-sub">Reframe · Shift · Reveal</div>
-    <p class="header-desc">Drop in any problem, situation, or idea. The Lens Engine forces it through five distinct perceptual lenses — returning reframes that change what's visible and what's possible.</p>
+    <div class="header-eye">Instrument 02</div>
+    <h1 class="header-title">NOISE <span>CLASSIFIER</span></h1>
+    <div class="header-sub">Filter · Separate · Extract</div>
+    <p class="header-desc">Drop in any noisy input — a message thread, a pitch, a pile of feedback, a transcript, a feed of takes. The Noise Classifier sorts it into five kinds of noise, scores the signal-to-noise ratio, and hands back the signal that was actually buried inside.</p>
   </div>
 
   <div class="lens-legend">
     <div class="lens-row">
       <div class="lens-num">01</div>
-      <div class="lens-name">Power</div>
-      <div class="lens-def">Who controls this? Who benefits? What leverage exists?</div>
+      <div class="lens-name">Static</div>
+      <div class="lens-def">Filler, hedging, throat-clearing — words carrying no information.</div>
     </div>
     <div class="lens-row">
       <div class="lens-num">02</div>
-      <div class="lens-name">Time</div>
-      <div class="lens-def">How does this look in 10 days, 10 months, 10 years?</div>
+      <div class="lens-name">Echo</div>
+      <div class="lens-def">Repetition and restatement — points that exist only because they were already said.</div>
     </div>
     <div class="lens-row">
       <div class="lens-num">03</div>
-      <div class="lens-name">Scale</div>
-      <div class="lens-def">What changes if this is 10x smaller or 10x larger?</div>
+      <div class="lens-name">Distortion</div>
+      <div class="lens-def">Spin, emotional charge, exaggeration that bends the actual signal.</div>
     </div>
     <div class="lens-row">
       <div class="lens-num">04</div>
-      <div class="lens-name">Inversion</div>
-      <div class="lens-def">What if the opposite were true? What does that reveal?</div>
+      <div class="lens-name">Decoy</div>
+      <div class="lens-def">Plausible side-issues that pull attention away from what matters.</div>
     </div>
     <div class="lens-row">
       <div class="lens-num">05</div>
-      <div class="lens-name">Relationship</div>
-      <div class="lens-def">What does this look like from every other perspective?</div>
+      <div class="lens-name">Vanity</div>
+      <div class="lens-def">Status and performance — things said to be seen saying them.</div>
     </div>
   </div>
 
   <div class="input-card">
-    <div class="field-label">Situation / Problem / Idea</div>
-    <textarea class="nc-textarea" id="lens-input" maxlength="500"
-      placeholder="Type anything — a decision you're stuck on, a creative block, a conflict, a belief, a strategy, a situation..."
+    <div class="field-label">Raw Input / Stream / Thread</div>
+    <textarea class="nc-textarea" id="nc-input" maxlength="2000"
+      placeholder="Paste anything noisy — a message thread, a pitch, a wall of feedback, a transcript, a feed of opinions..."
       oninput="updateCount()"></textarea>
-    <div class="char-count"><span id="char-count">0</span> / 500</div>
+    <div class="char-count"><span id="char-count">0</span> / 2000</div>
   </div>
 
-  <button class="cta-btn" id="lens-btn" onclick="runLens()">Run Lenses →</button>
+  <button class="cta-btn" id="nc-btn" onclick="runClassify()">Classify Noise →</button>
   <div class="error-msg" id="error-msg"></div>
 
   <div class="loading" id="loading">
     <div class="loading-bar"><div class="loading-fill"></div></div>
-    <div class="loading-label" id="loading-label">Engaging lens 01...</div>
+    <div class="loading-label" id="loading-label">Separating signal from noise...</div>
   </div>
 
   <div class="output" id="output">
     <hr class="divider">
 
-    <div class="sec-label">Input</div>
-    <div class="received-card">
-      <div class="received-label">Situation</div>
-      <div class="received-text" id="received-text"></div>
+    <div class="sec-label">Signal-to-Noise</div>
+    <div class="sharpest">
+      <div class="sharpest-label">Ratio</div>
+      <div class="sharpest-text"><span id="ratio-pct"></span> <span id="ratio-verdict" style="font-weight:400;color:var(--muted);font-size:14px;"></span></div>
     </div>
 
     <hr class="divider">
-    <div class="sec-label">Five Lenses</div>
-    <div class="lens-cards" id="lens-cards"></div>
+    <div class="sec-label">Five Kinds of Noise</div>
+    <div class="lens-cards" id="noise-cards"></div>
 
     <hr class="divider">
-    <div class="sec-label">Sharpest Reframe</div>
+    <div class="sec-label">Extracted Signal</div>
+    <div class="received-card">
+      <div class="received-label">What's actually being said</div>
+      <div class="received-text" id="signal-text"></div>
+    </div>
+
+    <hr class="divider">
+    <div class="sec-label">The One Thing That Matters</div>
     <div class="sharpest">
-      <div class="sharpest-label">The Lens That Changes Everything</div>
-      <div class="sharpest-text" id="sharpest-text"></div>
+      <div class="sharpest-label">Core Signal</div>
+      <div class="sharpest-text" id="core-text"></div>
     </div>
   </div>
 
   <div class="footer">
     <div class="footer-brand">GRAVIFI<span>CER</span></div>
-    <div class="footer-sub">Instrument 04 · MVANNP<br>© 2026 MVANNP / Gravificer. All rights reserved. Powered by Claude — Anthropic.</div>
+    <div class="footer-sub">Instrument 02 · MVANNP<br>© 2026 MVANNP / Gravificer. All rights reserved. Powered by Claude — Anthropic.</div>
   </div>
 
 </main>
 
 <script>
-const LENS_META = [
-  { num: '01', name: 'Power',        icon: '⚡', question: 'Who controls this? Where is the leverage?' },
-  { num: '02', name: 'Time',         icon: '◷', question: 'How does this look across 10 days, months, years?' },
-  { num: '03', name: 'Scale',        icon: '⊞', question: 'What changes at 10x smaller or 10x larger?' },
-  { num: '04', name: 'Inversion',    icon: '↺', question: 'What if the opposite were true?' },
-  { num: '05', name: 'Relationship', icon: '◎', question: 'What does this look like from every other angle?' },
+const NOISE_META = [
+  { num: '01', name: 'Static',     icon: '▒', question: 'Filler, hedging, throat-clearing.' },
+  { num: '02', name: 'Echo',       icon: '↻', question: 'Repetition and restatement.' },
+  { num: '03', name: 'Distortion', icon: '∿', question: 'Spin, charge, exaggeration.' },
+  { num: '04', name: 'Decoy',      icon: '◇', question: 'Plausible distractions from what matters.' },
+  { num: '05', name: 'Vanity',     icon: '★', question: 'Said to be seen saying it.' },
 ];
 
 function updateCount() {
   document.getElementById('char-count').textContent =
-    document.getElementById('lens-input').value.length;
+    document.getElementById('nc-input').value.length;
 }
 
 function setLoad(on, msg) {
   document.getElementById('loading').classList.toggle('visible', on);
-  document.getElementById('lens-btn').disabled = on;
+  document.getElementById('nc-btn').disabled = on;
   if (msg) document.getElementById('loading-label').textContent = msg;
 }
 
@@ -563,48 +570,51 @@ function showErr(msg) {
 
 function hideErr() { document.getElementById('error-msg').classList.remove('visible'); }
 
-const SYS = `You are the Gravificer Lens Engine — a precision instrument for forcing perception shifts.
+const SYS = `You are the Gravificer Noise Classifier — a precision instrument for separating signal from noise.
 
-Given any problem, situation, belief, or idea, you apply five distinct perceptual lenses. Each lens reveals something the default view cannot see.
+Given any noisy input (a message thread, a pitch, a pile of feedback, a transcript, a feed of opinions), you classify the noise into five distinct types, estimate the signal-to-noise ratio, and extract the signal that was actually buried inside.
 
-The five lenses:
-1. Power — Who controls this? Who benefits? Where is the real leverage or dependency?
-2. Time — How does this look in 10 days, 10 months, 10 years? What does time reveal or dissolve?
-3. Scale — What changes if this is 10x smaller? 10x larger? What does scale expose about the assumptions?
-4. Inversion — What if the opposite were true? What does inverting the premise reveal?
-5. Relationship — What does this look like from every other stakeholder's, observer's, or opponent's perspective?
+The five kinds of noise:
+1. Static — filler, hedging, throat-clearing, qualifiers; words that carry no information.
+2. Echo — repetition and restatement; points that exist only because they were already said, or because others said them.
+3. Distortion — spin, emotional charge, exaggeration, or framing that bends the actual signal away from what is true.
+4. Decoy — plausible-sounding side issues that pull attention away from what actually matters.
+5. Vanity — status signaling and performance; things said to be seen saying them rather than to inform.
 
 Gravificer philosophy: Every output must clarify, reveal, or reframe — otherwise it is noise.
 
 Return ONLY a valid JSON object — no markdown, no backticks, no preamble:
 
 {
-  "lenses": {
-    "power":        { "reframe": "<one sharp sentence — the reframe this lens delivers>", "detail": "<2 sentences expanding on what this lens reveals>" },
-    "time":         { "reframe": "<one sharp sentence>", "detail": "<2 sentences>" },
-    "scale":        { "reframe": "<one sharp sentence>", "detail": "<2 sentences>" },
-    "inversion":    { "reframe": "<one sharp sentence>", "detail": "<2 sentences>" },
-    "relationship": { "reframe": "<one sharp sentence>", "detail": "<2 sentences>" }
+  "ratio": { "signal_pct": <integer 0-100, your estimate of how much of the input is genuine signal>, "verdict": "<one sharp sentence characterizing the signal-to-noise balance>" },
+  "noise": {
+    "static":     { "finding": "<what static showed up, paraphrasing the input — or 'None detected'>", "detail": "<2 sentences on what it obscured>" },
+    "echo":       { "finding": "<...>", "detail": "<2 sentences>" },
+    "distortion": { "finding": "<...>", "detail": "<2 sentences>" },
+    "decoy":      { "finding": "<...>", "detail": "<2 sentences>" },
+    "vanity":     { "finding": "<...>", "detail": "<2 sentences>" }
   },
-  "sharpest": "<The single most powerful reframe across all five lenses — one sentence that changes what is possible>"
+  "signal": "<the clean extracted signal — what is actually being said once the noise is stripped, 1-3 sentences>",
+  "core": "<the single most important signal — one sentence that is the one thing that actually matters here>"
 }
 
-Each reframe must be specific to the input. No generic observations. The sharpest reframe should feel like a revelation.`;
+Be specific to the input. If a noise type is genuinely absent, say 'None detected' in its finding and explain briefly. The core signal should feel like the thing everything else was burying.`;
 
-async function runLens() {
+async function runClassify() {
   hideErr();
-  const text = document.getElementById('lens-input').value.trim();
-  if (!text) { showErr('No input detected. Describe a situation or problem to reframe.'); return; }
+  const text = document.getElementById('nc-input').value.trim();
+  if (!text) { showErr('No input detected. Paste a thread, pitch, or stream to classify.'); return; }
 
   document.getElementById('output').classList.remove('visible');
-  setLoad(true, 'Engaging lens 01...');
+  setLoad(true, 'Scanning for static...');
 
   const msgs = [
-    'Engaging lens 01 — Power...',
-    'Engaging lens 02 — Time...',
-    'Engaging lens 03 — Scale...',
-    'Engaging lens 04 — Inversion...',
-    'Engaging lens 05 — Relationship...',
+    'Scanning for static...',
+    'Detecting echoes...',
+    'Measuring distortion...',
+    'Flagging decoys...',
+    'Filtering vanity...',
+    'Extracting signal...',
   ];
   let mi = 0;
   const t = setInterval(() => {
@@ -617,10 +627,10 @@ async function runLens() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1200,
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1400,
         system: SYS,
-        messages: [{ role: 'user', content: 'Apply all five lenses to:\n\n' + text }]
+        messages: [{ role: 'user', content: 'Classify the noise in this input and extract the signal:\n\n' + text }]
       })
     });
 
@@ -632,22 +642,25 @@ async function runLens() {
     render(text, JSON.parse(raw.replace(/```json|```/g, '').trim()));
   } catch(e) {
     clearInterval(t); setLoad(false);
-    showErr('Lens failed. Check your connection and try again.');
+    showErr('Classification failed. Check your connection and try again.');
     console.error(e);
   }
 }
 
-const LENS_KEYS = ['power','time','scale','inversion','relationship'];
+const NOISE_KEYS = ['static','echo','distortion','decoy','vanity'];
 
 function render(input, d) {
-  document.getElementById('received-text').textContent = input;
+  const ratio = d.ratio || {};
+  const pct = (typeof ratio.signal_pct === 'number') ? ratio.signal_pct : '—';
+  document.getElementById('ratio-pct').textContent = pct + (pct === '—' ? '' : '% signal');
+  document.getElementById('ratio-verdict').textContent = ratio.verdict ? '— ' + ratio.verdict : '';
 
-  const lenses = d.lenses || {};
-  const container = document.getElementById('lens-cards');
+  const noise = d.noise || {};
+  const container = document.getElementById('noise-cards');
   container.innerHTML = '';
 
-  LENS_META.forEach((meta, i) => {
-    const lens = lenses[meta.name.toLowerCase()] || {};
+  NOISE_META.forEach((meta) => {
+    const n = noise[meta.name.toLowerCase()] || {};
     const card = document.createElement('div');
     card.className = 'lens-card';
     card.style.borderTop = '3px solid var(--accent)';
@@ -661,13 +674,14 @@ function render(input, d) {
         </div>
       </div>
       <div class="lens-card-body">
-        <div class="lens-card-reframe">${lens.reframe || ''}</div>
-        <div class="lens-card-detail">${lens.detail || ''}</div>
+        <div class="lens-card-reframe">${n.finding || ''}</div>
+        <div class="lens-card-detail">${n.detail || ''}</div>
       </div>`;
     container.appendChild(card);
   });
 
-  document.getElementById('sharpest-text').textContent = d.sharpest || '';
+  document.getElementById('signal-text').textContent = d.signal || '';
+  document.getElementById('core-text').textContent = d.core || '';
   document.getElementById('output').classList.add('visible');
   setTimeout(() => {
     document.getElementById('output').scrollIntoView({ behavior: 'smooth', block: 'start' });
