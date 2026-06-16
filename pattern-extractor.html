@@ -746,7 +746,7 @@ async function runExtract() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6',
         max_tokens: 1400,
         system: mode === 'text' ? SYS_TEXT : SYS_SYSTEM,
         messages: [{ role: 'user', content: 'Extract patterns from:\n\n' + text }]
